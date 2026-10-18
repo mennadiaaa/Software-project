@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard · Souvré Staff</title>
-    <link rel="stylesheet" href="../styles/staff.css">
+    <title>Dashboard · Souvré </title>
+    <link rel="stylesheet" href="../styles/customer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .dash-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
@@ -20,12 +20,22 @@
 </head>
 <body>
 <div class="shell">
-    <?php include 'includes/headerCustomer.php';
-    
-    
-    
-    
-    
-    
-    ?>
+    <?php include '../../includes/customer_sidebar.php'; ?> 
+<div class="main">
+    <?php include '../../includes/headerCustomer.php'; ?>
+
 </div>
+</div>
+    
+    
+    
+    
+    
+<script>
+    function tick() {
+    const d = new Date(), p = n => String(n).padStart(2,'0');
+    document.getElementById('clk').textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    document.getElementById('clk-date').textContent = d.toLocaleDateString('en-EG', { weekday:'short', month:'short', day:'numeric' });
+}
+tick(); setInterval(tick, 1000);
+</script>

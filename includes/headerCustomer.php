@@ -1,3 +1,4 @@
+
 <header class="topbar">
             <div>
                 <div class="page-eyebrow">Where every reservation matters · Cairo</div>

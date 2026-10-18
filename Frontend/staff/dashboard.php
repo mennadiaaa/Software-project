@@ -7,22 +7,23 @@
     <link rel="stylesheet" href="../styles/staff.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .dash-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
+        .dash-grid { display: grid;grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; }
         @media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } }
-        .floor-mini { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
-        .floor-mini .table-card { padding: 12px 8px; border-radius: 10px; }
-        .floor-mini .tc-num { font-size: 1.4rem; }
-        .floor-mini .tc-seats, .floor-mini .tc-guest { font-size: .62rem; }
-        .legend { display: flex; gap: 16px; margin-bottom: 12px; }
+        .floor-mini { display: grid; grid-template-columns: repeat(4,minmax(0, 1fr)); gap:8px; }
+        .floor-mini .table-card { padding: 12px 8px; border-radius: 10px; text-align:center; width:100%; min-width:0; }
+        .floor-mini .tc-num { font-size: 1.4rem; line-heght:1.1;}
+        .floor-mini .tc-seats, .floor-mini .tc-guest { font-size: .6rem; white-space: nowrap; }
+        .legend { display: flex; gap: 14px; margin-bottom: 12px; }
         .legend-item { display: flex; align-items: center; gap: 5px; font-size: .7rem; font-weight: 600; }
-        .dot { width: 9px; height: 9px; border-radius: 50%; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
     </style>
 </head>
 <body>
 
 <div class="shell">
     <?php 
-    include '../../includes/staff_sidebar.php'; 
+    include '../../includes/staff_sidebar.php';
+    
     $all_res = [
         'The Revolving Restaurant' => [
             ['18:30','Hassan, Ahmed',   2,'T-02','confirmed'],
@@ -45,18 +46,7 @@
     ?>
 
     <div class="main">
-        <header class="topbar">
-            <div>
-                <div class="page-eyebrow"><?= htmlspecialchars($assigned_restaurant) ?> · Cairo</div>
-                <h1 class="page-title">Staff Dashboard</h1>
-            </div>
-            <div class="topbar-right">
-                <div class="live-clock" style="text-align:right;">
-                    <span class="clock-time" id="clk"></span>
-                    <span class="clock-date" id="clk-date"></span>
-                </div>
-            </div>
-        </header>
+        <?php include '../../includes/headerStaff.php'; ?>
 
         <main class="content">
 
@@ -69,7 +59,7 @@
                     <div class="stat-label">Today's Reservations</div>
                 </div>
 
-                <div class="stat-card dark">
+                <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon navy"><i class="fa-solid fa-table-cells-large"></i></div>
                     </div>
