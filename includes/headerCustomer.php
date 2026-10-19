@@ -2,7 +2,7 @@
 <header class="topbar">
             <div>
                 <div class="page-eyebrow">Where every reservation matters · Cairo</div>
-                <h1 class="page-title">Welcome to Souvré</h1>
+                <h1 class="page-title">Welcome to Savouré</h1>
             </div>
             <div class="topbar-right">
                 <div class="live-clock" style="text-align:right;">

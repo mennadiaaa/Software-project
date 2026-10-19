@@ -42,7 +42,7 @@ $staff_param = '?staff=' . urlencode($staff_id);
     <div class="brand">
         <div class="brand-mark">⚜</div>
         <div>
-            <div class="brand-name">Souvré</div>
+            <div class="brand-name">Savouré</div>
             <div class="restaurant-name"><?= htmlspecialchars($current_staff['restaurant']) ?></div>
             <div class="brand-sub">Staff Portal</div>
         </div>

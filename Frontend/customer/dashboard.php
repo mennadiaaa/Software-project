@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard · Souvré </title>
+    <title>Dashboard · Savouré</title>
     <link rel="stylesheet" href="../styles/customer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -21,9 +21,10 @@
 <body>
 <div class="shell">
     <?php include '../../includes/customer_sidebar.php'; ?> 
-<div class="main">
-    <?php include '../../includes/headerCustomer.php'; ?>
-
+    <?php include '../../includes/custRest_sidebar.php'; ?>
+    <div class="main">
+        <?php include '../../includes/headerCustomer.php'; ?>
+    </div>
 </div>
 </div>
     

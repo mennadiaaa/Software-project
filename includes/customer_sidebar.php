@@ -40,7 +40,7 @@ $customer_param = '?customer=' . urlencode($customer_id);
     <div class="brand">
         <div class="brand-mark">⚜</div>
         <div>
-            <div class="brand-name">Souvré</div>
+            <div class="brand-name">Savouré</div>
             <div class="brand-sub">Guest Portal</div>
         </div>
     </div>
@@ -61,7 +61,7 @@ $customer_param = '?customer=' . urlencode($customer_id);
                 Restaurants
                 <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
             </button>
-            <div class="nav-submenu">
+            <!-- <div class="nav-submenu">
                 <a href="restaurants.php<?= $customer_param ?>&category=all" class="sub-link <?= ($page === 'restaurants.php' &&$category === 'all') ? 'active' : '' ?>">
                     All Restaurants
                 </a>
@@ -76,8 +76,8 @@ $customer_param = '?customer=' . urlencode($customer_id);
                 </a>
                 <a href="restaurants.php<?= $customer_param ?>&category=chinese" class="sub-link <?= ($page === 'restaurants.php' &&$category === 'chinese') ? 'active' : '' ?>">
                     🇨🇳 Chinese
-                </a>
-            </div>
+                </a> 
+            </div> -->
         </div>
 
         <!-- Bookings / Reservations -->
