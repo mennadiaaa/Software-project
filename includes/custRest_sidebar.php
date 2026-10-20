@@ -56,23 +56,24 @@ $customer_param = '?customer=' . urlencode($customer_id);
         </a>
 
         <!-- Restaurants Accordion / Submenu -->
-        <div class="nav-group <?= $page === 'restaurants.php' ? 'open' : '' ?>">
-            <button type="button" class="nav-link dropdown-toggle <?= $page === 'restaurants.php' ? 'active' : '' ?>" onclick="toggleDropdown(this)">
+        <div class="nav-group <?= $is_restaurant_active ? 'open' : '' ?>">
+            <button type="button" class="nav-link dropdown-toggle <?= $is_restaurant_active ? 'active' : '' ?>" onclick="toggleDropdown(this)">
                 <span class="icon"><i class="fa-solid fa-utensils"></i></span>
                 Restaurants
                 <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
             </button>
             <div class="nav-submenu">
-                <a href="restaurants.php<?= $customer_param ?>&category=all" class="sub-link <?= ($page === 'restaurants.php' && $category === 'all') ? 'active' : '' ?>">
+                <a href="allRestaurants.php<?= $customer_param ?>" class="sub-link <?= ($page === 'allRestaurants.php') ? 'active' : '' ?>">
                     All Restaurants
                 </a>
-                <a href="restaurants.php<?= $customer_param ?>&category=italian" class="sub-link <?= ($page === 'restaurants.php' && $category === 'italian') ? 'active' : '' ?>">
-                    🇮🇹 Italian
+                <a href="internationalRestaurants.php<?= $customer_param ?>" class="sub-link <?= ($page === 'internationalRestaurants.php') ? 'active' : '' ?>">
+                    International
                 </a>
-                <a href="restaurants.php<?= $customer_param ?>&category=chinese" class="sub-link <?= ($page === 'restaurants.php' && $category === 'chinese') ? 'active' : '' ?>">
-                    🇨🇳 Chinese
+                <a href="frenchRestaurants.php<?= $customer_param ?>" class="sub-link <?= ($page === 'frenchRestaurants.php') ? 'active' : '' ?>">
+                    🇫🇷 French
                 </a>
-                <a href="restaurants.php<?= $customer_param ?>&category=egyptian" class="sub-link <?= ($page === 'restaurants.php' && $category === 'egyptian') ? 'active' : '' ?>">
+                
+                <a href="egyptianRestaurants.php<?= $customer_param ?>" class="sub-link <?= ($page === 'egyptianRestaurants.php') ? 'active' : '' ?>">
                     🇪🇬 Egyptian
                 </a>
             </div>
@@ -82,6 +83,11 @@ $customer_param = '?customer=' . urlencode($customer_id);
         <a href="my_bookings.php<?= $customer_param ?>" class="nav-link <?= $page === 'my_bookings.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-calendar-check"></i></span>
             My Bookings
+        </a>
+
+        <a href="makeReservation.php<?= $customer_param ?>" class="nav-link <?= $page === 'makeReservation.php' ? 'active' : '' ?>">
+            <span class="icon"><i class="fa-solid fa-calendar-plus"></i></span>
+            Make a Reservation
         </a>
     </nav>
 
@@ -168,10 +174,33 @@ $customer_param = '?customer=' . urlencode($customer_id);
 </style>
 
 <script>
+// Toggle function that saves the open state to localStorage
 function toggleDropdown(button) {
     const navGroup = button.closest('.nav-group');
     navGroup.classList.toggle('open');
+    
+    // Save state locally
+    const isOpen = navGroup.classList.contains('open');
+    localStorage.setItem('savoure_restaurants_dropdown_open', isOpen ? 'true' : 'false');
 }
+
+// Restore state automatically when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    const navGroup = document.querySelector('.nav-group');
+    if (!navGroup) return;
+
+    // Check if current page belongs to restaurant section
+    const currentPath = window.location.pathname.toLowerCase();
+    const isRestaurantPage = ['allrestaurants', 'restaurants', 'frenchrestaurants', 'egyptianrestaurants', 'internationalrestaurants']
+        .some(page => currentPath.includes(page));
+
+    const savedState = localStorage.getItem('savoure_restaurants_dropdown_open');
+
+    // Keep open if user manually opened it OR if currently on a restaurant page
+    if (savedState === 'true' || isRestaurantPage) {
+        navGroup.classList.add('open');
+    }
+});
 
 function switchCustomerAccount(id, ev) {
     if (ev) ev.preventDefault();
