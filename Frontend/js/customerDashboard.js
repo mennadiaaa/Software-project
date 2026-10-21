@@ -8,19 +8,19 @@ const RECOMMENDATIONS = [
         restaurant: "The Revolving Restaurant",
         dish: "Filet Mignon & Truffle Butter",
         description: "Prime tenderloin steak served with roasted wild mushrooms and infused truffle butter.",
-        price: "$48.00"
+        price: "1200 EGP"
     },
     {
         restaurant: "Le Petite Chef",
         dish: "Bouillabaisse Marseillaise",
         description: "Classic French seafood stew with saffron broth, tiger prawns, and sea bass.",
-        price: "$42.00"
+        price: "1600 EGP"
     },
     {
         restaurant: "Mo Bistro",
         dish: "Slow-Cooked Short Rib Risotto",
         description: "Creamy Parmesan risotto topped with 12-hour braised beef short rib and red wine reduction.",
-        price: "$36.00"
+        price: "560 EGP"
     }
 ];
 
