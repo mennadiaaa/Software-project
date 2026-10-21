@@ -1,37 +1,46 @@
 /**
- * Savouré — Restaurant Menu & Pre-Order (Phase 1: localStorage)
- * Menu data is seeded here. Swap with API later without touching menu.php.
+ * Savouré — Restaurant Menu + In-Page Cart (Phase 1: localStorage)
+ * All menu data lives here. Cart persists across menu/checkout pages via localStorage.
  */
 
 const MENU_DATA = {
     "The Revolving Restaurant": {
-        cuisine: "International Fine Dining",
+        cuisine: "International Fine Dining · Cairo Tower",
         sections: [
             {
                 name: "Starters",
                 icon: "fa-bowl-food",
                 items: [
-                    { id: "rev-s1", name: "Mushroom Cream Soup", desc: "Velvety wild mushroom soup with truffle oil and chives.", price: 320 },
-                    { id: "rev-s2", name: "Crab Bisque", desc: "Rich Egyptian crab bisque, cognac cream, crispy croutons.", price: 380 },
-                    { id: "rev-s3", name: "Caesar Salad", desc: "Romaine, aged parmesan, garlic croutons, house Caesar dressing.", price: 290 }
+                    { id: "rev-s1", name: "Crab Bisque", desc: "Rich Egyptian crab bisque, cognac cream, crispy croutons.", price: 620 },
+                    { id: "rev-s2", name: "Wild Mushroom Velouté", desc: "Silky wild mushroom soup, white truffle oil, chives.", price: 540 },
+                    { id: "rev-s3", name: "Grilled Shrimp & Coconut Sauce", desc: "Tiger prawns, coconut cream sauce, citrus zest.", price: 780 }
                 ]
             },
             {
                 name: "Main Courses",
                 icon: "fa-drumstick-bite",
                 items: [
-                    { id: "rev-m1", name: "Grilled Rib Eye Steak", desc: "300g prime rib eye, roasted potatoes, seasonal vegetables, peppercorn sauce.", price: 1450 },
-                    { id: "rev-m2", name: "Chicken Risotto", desc: "Creamy arborio risotto with grilled chicken, parmesan, and fresh herbs.", price: 780 },
-                    { id: "rev-m3", name: "Lamb Shank", desc: "Slow-cooked lamb shank, thyme jus, mashed potatoes, glazed carrots.", price: 1250 },
-                    { id: "rev-m4", name: "Grilled Sea Bass", desc: "Pan-seared sea bass fillet, lemon butter, sautéed spinach.", price: 980 }
+                    { id: "rev-m1", name: "Dry-Aged Rib Eye Steak", desc: "300g prime rib eye, truffle mashed potatoes, peppercorn jus.", price: 1650 },
+                    { id: "rev-m2", name: "Pan-Seared Sea Bass", desc: "Sea bass fillet, lemon butter, sautéed spinach, crispy skin.", price: 1180 },
+                    { id: "rev-m3", name: "Duck Breast", desc: "Roasted duck breast, cherry reduction, seasonal vegetables.", price: 1380 },
+                    { id: "rev-m4", name: "Chicken Risotto", desc: "Creamy arborio risotto, grilled chicken, aged parmesan.", price: 950 },
+                    { id: "rev-m5", name: "Grilled Salmon", desc: "Atlantic salmon, mashed potatoes, dill cream sauce.", price: 1120 }
                 ]
             },
             {
                 name: "Desserts",
                 icon: "fa-cake-candles",
                 items: [
-                    { id: "rev-d1", name: "Chocolate Fondant", desc: "Warm dark chocolate cake, molten center, vanilla ice cream.", price: 350 },
-                    { id: "rev-d2", name: "Apple Tart", desc: "Thin apple tart, caramel drizzle, cinnamon cream.", price: 320 }
+                    { id: "rev-d1", name: "Chocolate Fondant", desc: "Warm dark chocolate cake, molten center, vanilla ice cream.", price: 420 },
+                    { id: "rev-d2", name: "Apple Tart", desc: "Thin apple tart, caramel drizzle, cinnamon cream.", price: 380 }
+                ]
+            },
+            {
+                name: "Tasting Menu (Per Person)",
+                icon: "fa-hat-chef",
+                items: [
+                    { id: "rev-t1", name: "3-Course Tasting Menu", desc: "Starter + Main + Dessert. Excludes beverages and service charge.", price: 1800 },
+                    { id: "rev-t2", name: "4-Course Tasting Menu", desc: "Starter + Soup + Main + Dessert. Excludes beverages and service charge.", price: 2200 }
                 ]
             }
         ]
@@ -95,13 +104,27 @@ const MENU_DATA = {
 };
 
 const CART_KEY = 'savoure_cart';
-const ORDER_TYPE_KEY = 'savoure_order_type';
+const ORDERS_KEY = 'savoure_preorders';
 
+let currentFulfillment = 'pickup';
+
+/* ---------- Cart storage (scoped per restaurant) ---------- */
 function getCart() {
     try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch(e) { return {}; }
 }
 function saveCart(cart) { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
 
+function getRestaurantCart() {
+    const cart = getCart();
+    const restaurant = window.SAVOURE_RESTAURANT;
+    const out = {};
+    Object.entries(cart).forEach(([k, v]) => {
+        if (v.restaurant === restaurant) out[k] = v;
+    });
+    return out;
+}
+
+/* ---------- Menu rendering ---------- */
 function renderMenu() {
     const restaurant = window.SAVOURE_RESTAURANT;
     const data = MENU_DATA[restaurant];
@@ -113,7 +136,7 @@ function renderMenu() {
     }
 
     document.getElementById('menu-hero-title').textContent = restaurant;
-    document.getElementById('menu-hero-cuisine').textContent = data.cuisine + ' · Cairo';
+    document.getElementById('menu-hero-cuisine').textContent = data.cuisine;
 
     let html = '';
     data.sections.forEach(section => {
@@ -127,40 +150,200 @@ function renderMenu() {
                         <div class="menu-item-desc">${item.desc}</div>
                         <div class="menu-item-price">${item.price.toLocaleString()} EGP <small>per person</small></div>
                     </div>
-                    <button class="menu-item-add" title="Add to pre-order" onclick="addToCart('${item.id}', '${restaurant}', '${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                        <i class="fa-solid fa-plus"></i>
+                    <button class="menu-item-add" onclick="addToCart('${item.id}', '${item.name.replace(/'/g, "\\'")}', ${item.price})">
+                        <i class="fa-solid fa-plus"></i> Add
                     </button>
                 </div>`;
         });
         html += `</div>`;
     });
 
-    // Pre-order CTA
-    html += `
-        <div class="menu-cta">
-            <div class="menu-cta-text">
-                <strong>Pre-order for pickup or dine-in</strong>
-                <span>Add dishes above, then choose how you'd like to enjoy your meal.</span>
-            </div>
-            <a href="checkout.php?restaurant=${encodeURIComponent(restaurant)}&customer=${window.SAVOURE_CUSTOMER}" class="btn btn-gold">
-                <i class="fa-solid fa-bag-shopping"></i> Review Pre-Order
-            </a>
-        </div>`;
-
     container.innerHTML = html;
 }
 
-function addToCart(itemId, restaurant, itemName, price) {
+/* ---------- Add / remove / change qty ---------- */
+function addToCart(itemId, itemName, price) {
+    const restaurant = window.SAVOURE_RESTAURANT;
     const cart = getCart();
     const key = `${restaurant}::${itemId}`;
+
     if (!cart[key]) {
         cart[key] = { restaurant, itemId, name: itemName, price, qty: 0 };
     }
     cart[key].qty += 1;
     saveCart(cart);
+
+    renderCart();
     showMenuToast(`Added: ${itemName}`);
 }
 
+function changeQty(key, delta) {
+    const cart = getCart();
+    if (!cart[key]) return;
+    cart[key].qty += delta;
+    if (cart[key].qty <= 0) delete cart[key];
+    saveCart(cart);
+    renderCart();
+}
+
+function removeLine(key) {
+    const cart = getCart();
+    delete cart[key];
+    saveCart(cart);
+    renderCart();
+}
+
+function clearRestaurantCart() {
+    const cart = getCart();
+    const restaurant = window.SAVOURE_RESTAURANT;
+    Object.keys(cart).forEach(k => {
+        if (cart[k].restaurant === restaurant) delete cart[k];
+    });
+    saveCart(cart);
+    renderCart();
+}
+
+/* ---------- Cart rendering ---------- */
+function renderCart() {
+    const restaurantCart = getRestaurantCart();
+    const lines = Object.entries(restaurantCart);
+
+    const bodyEl = document.getElementById('cart-body');
+    const countEl = document.getElementById('cart-count');
+    const fabCountEl = document.getElementById('cart-fab-count');
+    const totalEl = document.getElementById('cart-total');
+    const placeBtn = document.getElementById('place-order-btn');
+
+    let totalQty = 0;
+    let totalPrice = 0;
+    lines.forEach(([k, v]) => { totalQty += v.qty; totalPrice += v.price * v.qty; });
+
+    countEl.textContent = totalQty;
+    if (fabCountEl) fabCountEl.textContent = totalQty;
+    totalEl.textContent = totalPrice.toLocaleString() + ' EGP';
+    placeBtn.disabled = totalQty === 0;
+
+    if (lines.length === 0) {
+        bodyEl.innerHTML = `
+            <div class="cart-empty">
+                <i class="fa-solid fa-bag-shopping"></i>
+                Your cart is empty.<br>Tap "Add" on any dish to begin.
+            </div>`;
+        return;
+    }
+
+    bodyEl.innerHTML = '';
+    lines.forEach(([key, item]) => {
+        const line = document.createElement('div');
+        line.className = 'cart-line';
+        line.innerHTML = `
+            <div class="cart-line-info">
+                <div class="cart-line-name">${item.name}</div>
+                <div class="cart-line-price">${item.price.toLocaleString()} EGP</div>
+                <div class="cart-line-qty">
+                    <button class="cart-qbtn" onclick="changeQty('${key}', -1)">−</button>
+                    <span class="cart-qnum">${item.qty}</span>
+                    <button class="cart-qbtn" onclick="changeQty('${key}', 1)">+</button>
+                </div>
+            </div>
+            <button class="cart-remove" onclick="removeLine('${key}')" title="Remove">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        `;
+        bodyEl.appendChild(line);
+    });
+}
+
+/* ---------- Fulfillment switch ---------- */
+function selectFulfillment(type, el) {
+    currentFulfillment = type;
+    document.querySelectorAll('.fulfill-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('pickup-fields').style.display = type === 'pickup' ? 'block' : 'none';
+    document.getElementById('dinein-fields').style.display = type === 'dinein' ? 'block' : 'none';
+}
+
+/* ---------- Place pre-order (writes to localStorage.savoure_preorders) ---------- */
+function placePreOrder() {
+    const restaurantCart = getRestaurantCart();
+    const lines = Object.entries(restaurantCart);
+
+    if (lines.length === 0) return;
+
+    let total = 0;
+    const items = lines.map(([k, v]) => {
+        total += v.price * v.qty;
+        return { itemId: v.itemId, name: v.name, qty: v.qty, price: v.price, lineTotal: v.price * v.qty };
+    });
+
+    const order = {
+        id: 'pre_' + Date.now(),
+        restaurant: window.SAVOURE_RESTAURANT,
+        customer: window.SAVOURE_CUSTOMER,
+        type: currentFulfillment,
+        items: items,
+        total: total,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+    };
+
+    if (currentFulfillment === 'pickup') {
+        order.pickupTime = document.getElementById('pickup-time').value;
+    } else {
+        order.arrivalTime = document.getElementById('dinein-time').value;
+        order.partySize = document.getElementById('dinein-party').value;
+        order.notes = document.getElementById('dinein-notes').value.trim();
+    }
+
+    // Save to shared preorders list (checkout/teammate side can read this)
+    const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
+    orders.push(order);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+
+    // Clear this restaurant's cart
+    clearRestaurantCart();
+
+    showConfirmation(order, total);
+}
+
+function showConfirmation(order, total) {
+    const body = document.getElementById('cart-body');
+    const foot = document.getElementById('cart-foot');
+
+    body.innerHTML = `
+        <div style="text-align:center;padding:28px 12px;">
+            <div style="font-size:2.6rem;color:#2D7A5F;margin-bottom:12px;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div style="font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--navy);margin-bottom:6px;">Pre-Order Saved</div>
+            <div style="font-size:.78rem;color:var(--charcoal);opacity:.7;margin-bottom:4px;">
+                Order <strong>${order.id}</strong>
+            </div>
+            <div style="font-size:.78rem;color:var(--charcoal);opacity:.7;margin-bottom:16px;">
+                ${order.type === 'pickup' ? 'Pickup at ' + order.pickupTime : 'Dine-In · ' + order.partySize + ' guests at ' + order.arrivalTime}
+            </div>
+            <div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold-dk);">
+                ${total.toLocaleString()} EGP
+            </div>
+        </div>`;
+    foot.style.display = 'none';
+
+    // Restore cart UI after a few seconds so they can order more
+    setTimeout(() => {
+        foot.style.display = 'block';
+        renderCart();
+    }, 5000);
+}
+
+/* ---------- Mobile cart drawer ---------- */
+function openMobileCart() {
+    document.getElementById('cart-panel').classList.add('mobile-open');
+}
+function closeMobileCart() {
+    document.getElementById('cart-panel').classList.remove('mobile-open');
+}
+
+/* ---------- Toast ---------- */
 function showMenuToast(msg) {
     let zone = document.querySelector('.toast-zone');
     if (!zone) {
@@ -175,4 +358,8 @@ function showMenuToast(msg) {
     setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 2600);
 }
 
-document.addEventListener('DOMContentLoaded', renderMenu);
+/* ---------- Init ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+    renderMenu();
+    renderCart();
+});
