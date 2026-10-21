@@ -1,6 +1,11 @@
 /**
  * Savouré — Restaurant Menu + In-Page Cart (Phase 1: localStorage)
- * All menu data lives here. Cart persists across menu/checkout pages via localStorage.
+ * - Cart is namespaced per customer: savoure_cart::<customerId>
+ * - Customer reservations are namespaced: savoure_customer_reservations::<customerId>
+ * - Dine-In pre-orders require an existing, non-cancelled, future-or-today reservation
+ *   at the same restaurant.
+ * - Pre-orders are written to a single shared array (savoure_preorders) with the
+ *   customer tag inside, so staff can see all customers for their restaurant.
  */
 
 const MENU_DATA = {
@@ -103,16 +108,50 @@ const MENU_DATA = {
     }
 };
 
-const CART_KEY = 'savoure_cart';
 const ORDERS_KEY = 'savoure_preorders';
 
 let currentFulfillment = 'pickup';
+let hasReservation = false;
 
-/* ---------- Cart storage (scoped per restaurant) ---------- */
-function getCart() {
-    try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch(e) { return {}; }
+/* ---------- Per-customer storage keys ---------- */
+function currentCustomer() {
+    return window.SAVOURE_CUSTOMER || 'guest';
 }
-function saveCart(cart) { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+function cartKey() {
+    return 'savoure_cart::' + currentCustomer();
+}
+function customerResKey() {
+    return 'savoure_customer_reservations::' + currentCustomer();
+}
+
+/* ---------- Cart storage ---------- */
+function getCart() {
+    try {
+        const raw = localStorage.getItem(cartKey());
+        if (raw) return JSON.parse(raw);
+
+        // Legacy migration: an old unscoped cart from before this fix
+        // belongs to the *default* account (sarah). Move it once.
+        if (currentCustomer() === 'sarah') {
+            const legacy = localStorage.getItem('savoure_cart');
+            if (legacy) {
+                const parsed = JSON.parse(legacy);
+                localStorage.setItem(cartKey(), JSON.stringify(parsed));
+                localStorage.removeItem('savoure_cart');
+                return parsed;
+            }
+        }
+        return {};
+    } catch(e) { return {}; }
+}
+
+function saveCart(cart) {
+    localStorage.setItem(cartKey(), JSON.stringify(cart));
+}
+
+function notifyCartChanged() {
+    window.dispatchEvent(new Event('cart-updated'));
+}
 
 function getRestaurantCart() {
     const cart = getCart();
@@ -122,6 +161,51 @@ function getRestaurantCart() {
         if (v.restaurant === restaurant) out[k] = v;
     });
     return out;
+}
+
+/* ---------- Reservations check ---------- */
+function getCustomerReservations() {
+    try {
+        const raw = localStorage.getItem(customerResKey());
+        if (raw) return JSON.parse(raw);
+
+        // Legacy migration (same rule as the cart)
+        if (currentCustomer() === 'sarah') {
+            const legacy = localStorage.getItem('savoure_customer_reservations');
+            if (legacy) {
+                const parsed = JSON.parse(legacy);
+                localStorage.setItem(customerResKey(), JSON.stringify(parsed));
+                localStorage.removeItem('savoure_customer_reservations');
+                return parsed;
+            }
+        }
+        return [];
+    } catch(e) { return []; }
+}
+
+/**
+ * Active reservations for the current customer at the current restaurant,
+ * on today or a future date, not cancelled / declined.
+ */
+function getActiveReservationsForCurrentRestaurant() {
+    const restaurant = window.SAVOURE_RESTAURANT;
+    const customer = currentCustomer();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+
+    return getCustomerReservations().filter(r => {
+        if (r.restaurant !== restaurant) return false;
+        if (r.customer && r.customer !== customer) return false;
+        if (r.status === 'cancelled' || r.status === 'declined') return false;
+        if (!r.date) return false;
+        const d = new Date(r.date);
+        if (isNaN(d.getTime())) return false;
+        d.setHours(0, 0, 0, 0);
+        return d >= today;
+    });
+}
+
+function hasUpcomingReservation() {
+    return getActiveReservationsForCurrentRestaurant().length > 0;
 }
 
 /* ---------- Menu rendering ---------- */
@@ -172,6 +256,7 @@ function addToCart(itemId, itemName, price) {
     }
     cart[key].qty += 1;
     saveCart(cart);
+    notifyCartChanged();
 
     renderCart();
     showMenuToast(`Added: ${itemName}`);
@@ -183,6 +268,7 @@ function changeQty(key, delta) {
     cart[key].qty += delta;
     if (cart[key].qty <= 0) delete cart[key];
     saveCart(cart);
+    notifyCartChanged();
     renderCart();
 }
 
@@ -190,6 +276,7 @@ function removeLine(key) {
     const cart = getCart();
     delete cart[key];
     saveCart(cart);
+    notifyCartChanged();
     renderCart();
 }
 
@@ -200,6 +287,7 @@ function clearRestaurantCart() {
         if (cart[k].restaurant === restaurant) delete cart[k];
     });
     saveCart(cart);
+    notifyCartChanged();
     renderCart();
 }
 
@@ -222,6 +310,10 @@ function renderCart() {
     if (fabCountEl) fabCountEl.textContent = totalQty;
     totalEl.textContent = totalPrice.toLocaleString() + ' EGP';
     placeBtn.disabled = totalQty === 0;
+
+    // Recompute reservation availability + update Dine-In tab
+    hasReservation = hasUpcomingReservation();
+    updateDineInTab();
 
     if (lines.length === 0) {
         bodyEl.innerHTML = `
@@ -254,21 +346,69 @@ function renderCart() {
     });
 }
 
+/**
+ * Enable / disable the Dine-In tab based on reservation presence.
+ * If no reservation: tab disabled + a hint appears below the tabs.
+ */
+function updateDineInTab() {
+    const dineInTab = document.querySelector('.fulfill-tab[data-type="dinein"]');
+    const hint = document.getElementById('dinein-hint');
+
+    if (!dineInTab) return;
+
+    if (hasReservation) {
+        dineInTab.disabled = false;
+        dineInTab.classList.remove('disabled');
+        dineInTab.removeAttribute('title');
+        if (hint) hint.style.display = 'none';
+    } else {
+        dineInTab.disabled = true;
+        dineInTab.classList.add('disabled');
+        dineInTab.setAttribute('title', 'Make a reservation first');
+
+        // If user was on dine-in and lost eligibility, snap back to pickup
+        if (currentFulfillment === 'dinein') {
+            currentFulfillment = 'pickup';
+            document.querySelectorAll('.fulfill-tab').forEach(t => t.classList.remove('active'));
+            const pickupTab = document.querySelector('.fulfill-tab[data-type="pickup"]');
+            if (pickupTab) pickupTab.classList.add('active');
+            const pickupFields = document.getElementById('pickup-fields');
+            const dineinFields = document.getElementById('dinein-fields');
+            if (pickupFields) pickupFields.style.display = 'block';
+            if (dineinFields) dineinFields.style.display = 'none';
+        }
+
+        if (hint) hint.style.display = 'flex';
+    }
+}
+
 /* ---------- Fulfillment switch ---------- */
 function selectFulfillment(type, el) {
+    if (type === 'dinein' && !hasReservation) {
+        showMenuToast('You need a reservation to order for dine-in.', 'error');
+        return;
+    }
     currentFulfillment = type;
     document.querySelectorAll('.fulfill-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('pickup-fields').style.display = type === 'pickup' ? 'block' : 'none';
     document.getElementById('dinein-fields').style.display = type === 'dinein' ? 'block' : 'none';
+    attachAutoGrow(document.getElementById('dinein-notes'));
 }
 
-/* ---------- Place pre-order (writes to localStorage.savoure_preorders) ---------- */
+/* ---------- Place pre-order ---------- */
 function placePreOrder() {
     const restaurantCart = getRestaurantCart();
     const lines = Object.entries(restaurantCart);
 
     if (lines.length === 0) return;
+
+    // Guard: dine-in must have a reservation
+    if (currentFulfillment === 'dinein' && !hasUpcomingReservation()) {
+        showMenuToast('Dine-in pre-orders require a reservation at this restaurant.', 'error');
+        updateDineInTab();
+        return;
+    }
 
     let total = 0;
     const items = lines.map(([k, v]) => {
@@ -279,7 +419,7 @@ function placePreOrder() {
     const order = {
         id: 'pre_' + Date.now(),
         restaurant: window.SAVOURE_RESTAURANT,
-        customer: window.SAVOURE_CUSTOMER,
+        customer: currentCustomer(),
         type: currentFulfillment,
         items: items,
         total: total,
@@ -290,12 +430,14 @@ function placePreOrder() {
     if (currentFulfillment === 'pickup') {
         order.pickupTime = document.getElementById('pickup-time').value;
     } else {
+        const activeRes = getActiveReservationsForCurrentRestaurant();
+        order.reservationId = activeRes[0] ? activeRes[0].id : null;
         order.arrivalTime = document.getElementById('dinein-time').value;
         order.partySize = document.getElementById('dinein-party').value;
         order.notes = document.getElementById('dinein-notes').value.trim();
     }
 
-    // Save to shared preorders list (checkout/teammate side can read this)
+    // Save to shared preorders list (staff side reads this, filtered by restaurant)
     const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
     orders.push(order);
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
@@ -335,6 +477,19 @@ function showConfirmation(order, total) {
     }, 5000);
 }
 
+/* ---------- Textarea auto-grow (bounded inside card) ---------- */
+function attachAutoGrow(ta) {
+    if (!ta || ta.dataset.autogrow === '1') return;
+    ta.dataset.autogrow = '1';
+    const maxH = 140;
+    const fit = () => {
+        ta.style.height = 'auto';
+        ta.style.height = Math.min(ta.scrollHeight, maxH) + 'px';
+    };
+    ta.addEventListener('input', fit);
+    setTimeout(fit, 0);
+}
+
 /* ---------- Mobile cart drawer ---------- */
 function openMobileCart() {
     document.getElementById('cart-panel').classList.add('mobile-open');
@@ -344,7 +499,7 @@ function closeMobileCart() {
 }
 
 /* ---------- Toast ---------- */
-function showMenuToast(msg) {
+function showMenuToast(msg, type = 'success') {
     let zone = document.querySelector('.toast-zone');
     if (!zone) {
         zone = document.createElement('div');
@@ -352,7 +507,7 @@ function showMenuToast(msg) {
         document.body.appendChild(zone);
     }
     const t = document.createElement('div');
-    t.className = 'toast success';
+    t.className = 'toast ' + type;
     t.textContent = msg;
     zone.appendChild(t);
     setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 2600);
@@ -362,4 +517,5 @@ function showMenuToast(msg) {
 document.addEventListener('DOMContentLoaded', () => {
     renderMenu();
     renderCart();
+    attachAutoGrow(document.getElementById('dinein-notes'));
 });
