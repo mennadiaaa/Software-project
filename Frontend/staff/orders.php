@@ -18,14 +18,59 @@
         .served-msg { display: flex; align-items: center; gap: 8px; color: #2D7A5F; font-size: .82rem; font-weight: 700; }
         .empty-panel { padding: 40px; text-align: center; color: var(--beige); }
         .empty-panel i { font-size: 1.8rem; opacity: .4; display: block; margin-bottom: 10px; }
+
+        /* ---------- Pre-Order Panel (new) ---------- */
+        .preorder-panel { grid-column: 1 / -1; margin-top: 8px; }
+        .preorder-panel .card-head { background: linear-gradient(135deg, #A8843E, #C9A96E); }
+        .preorder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 20px; }
+        @media (max-width: 700px) { .preorder-grid { grid-template-columns: 1fr; } }
+
+        .preorder-card {
+            background: #fff; border: 1px solid var(--cream); border-left: 4px solid var(--gold);
+            border-radius: 12px; padding: 16px 18px;
+            box-shadow: 0 2px 10px rgba(31,42,68,.06);
+            display: flex; flex-direction: column; gap: 10px;
+            transition: all var(--t);
+        }
+        .preorder-card:hover { box-shadow: 0 6px 20px rgba(31,42,68,.1); transform: translateY(-2px); }
+        .preorder-card.dinein  { border-left-color: #4F46E5; }
+        .preorder-card.pickup  { border-left-color: #2D7A5F; }
+
+        .po-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+        .po-id { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--navy); }
+        .po-type-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 20px;
+            font-size: .6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+        }
+        .po-type-badge.pickup { background: #EAF5EF; color: #2D7A5F; }
+        .po-type-badge.dinein { background: #EEF2FF; color: #4F46E5; }
+
+        .po-meta { font-size: .72rem; color: var(--charcoal); opacity: .7; display: flex; flex-wrap: wrap; gap: 10px; }
+        .po-meta i { color: var(--beige); margin-right: 3px; }
+
+        .po-items { font-size: .78rem; padding: 8px 0; border-top: 1px solid var(--cream); border-bottom: 1px solid var(--cream); }
+        .po-item { display: flex; justify-content: space-between; padding: 3px 0; gap: 8px; }
+        .po-item .qty { font-weight: 700; color: var(--navy); min-width: 22px; }
+        .po-item .nm  { flex: 1; color: var(--charcoal); }
+        .po-item .pr  { color: var(--navy); font-weight: 600; font-size: .76rem; white-space: nowrap; }
+
+        .po-notes { font-size: .74rem; font-style: italic; color: var(--charcoal); opacity: .75; background: var(--ivory); padding: 8px 10px; border-radius: 6px; }
+
+        .po-total { display: flex; justify-content: space-between; align-items: center; padding-top: 4px; }
+        .po-total-lbl { font-size: .66rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--beige); }
+        .po-total-val { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; color: var(--navy); }
+
+        .po-actions { display: flex; gap: 8px; margin-top: 4px; }
+        .po-actions .btn { flex: 1; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div class="shell">
-    <?php 
-    include '../../includes/staff_sidebar.php'; 
+    <?php include '../../includes/staff_sidebar.php'; ?>
 
+    <?php
     $all_orders = [
         'The Revolving Restaurant' => [
             'incoming' => [
@@ -246,6 +291,22 @@
                     </div>
                 </div>
 
+                <!-- ============ NEW: Customer Pre-Orders ============ -->
+                <div class="preorder-panel">
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="card-head-title">
+                                <i class="fa-solid fa-bag-shopping" style="color:var(--navy-dk);margin-right:6px;"></i>
+                                Customer Pre-Orders
+                            </span>
+                            <span class="card-count" id="pre-count">0</span>
+                        </div>
+                        <div class="preorder-grid" id="preorder-list">
+                            <!-- Rendered by staffPreorders.js -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -376,5 +437,6 @@ function toast(msg, type='') {
     setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 3800);
 }
 </script>
+<script src="../js/staffPreorders.js"></script>
 </body>
 </html>
