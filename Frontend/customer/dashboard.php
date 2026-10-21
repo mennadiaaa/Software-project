@@ -68,6 +68,9 @@
 </div>
 
 <!-- Linked External JavaScript File -->
+<script>
+    window.SAVOURE_CUSTOMER = <?= json_encode($customer_id) ?>;
+</script>
 <script src="../js/customerDashboard.js"></script>
 </body>
 </html>

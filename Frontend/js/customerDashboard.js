@@ -55,6 +55,11 @@ const RESTAURANTS = [
     }
 ];
 
+// Current customer ID — injected by each page via window.SAVOURE_CUSTOMER.
+function currentCustomerParam() {
+    return encodeURIComponent(window.SAVOURE_CUSTOMER || 'sarah');
+}
+
 // Live Clock Handler
 function tick() {
     const clk = document.getElementById('clk');
@@ -76,6 +81,7 @@ function renderRecommendations() {
     RECOMMENDATIONS.forEach(rec => {
         const card = document.createElement('div');
         card.className = 'rec-card';
+        const menuUrl = `menu.php?restaurant=${encodeURIComponent(rec.restaurant)}&customer=${currentCustomerParam()}`;
         card.innerHTML = `
             <div>
                 <span class="rec-tag">${rec.restaurant}</span>
@@ -84,7 +90,7 @@ function renderRecommendations() {
             </div>
             <div class="rec-footer">
                 <span class="rec-price">${rec.price}</span>
-                <button class="rec-btn">Order Now</button>
+                <button class="rec-btn" onclick="window.location.href='${menuUrl}'">Order Now</button>
             </div>
         `;
         grid.appendChild(card);
@@ -98,7 +104,6 @@ function renderRestaurantCards() {
 
     const filterCategory = grid.getAttribute('data-category');
     
-    // Filter restaurants if a category data attribute exists
     const listToRender = filterCategory 
         ? RESTAURANTS.filter(r => r.category.toLowerCase() === filterCategory.toLowerCase())
         : RESTAURANTS;
@@ -113,6 +118,7 @@ function renderRestaurantCards() {
     listToRender.forEach(rest => {
         const card = document.createElement('div');
         card.className = 'rest-card';
+        const custParam = currentCustomerParam();
         card.innerHTML = `
             <div class="rest-img-wrapper">
                 <img src="${rest.image}" alt="${rest.name}" class="rest-img">
@@ -135,8 +141,8 @@ function renderRestaurantCards() {
                         </div>
                     </div>
                     <div class="rest-footer">
-                        <a href="menu.php?restaurant=${encodeURIComponent(rest.name)}" class="btn-rest btn-rest-outline">View Menu</a>
-                        <a href="reserve.php?restaurant=${encodeURIComponent(rest.name)}" class="btn-rest btn-rest-primary">Reserve Table</a>
+                        <a href="menu.php?restaurant=${encodeURIComponent(rest.name)}&customer=${custParam}" class="btn-rest btn-rest-outline">View Menu</a>
+                        <a href="reserve.php?restaurant=${encodeURIComponent(rest.name)}&customer=${custParam}" class="btn-rest btn-rest-primary">Reserve Table</a>
                     </div>
                 </div>
             </div>
