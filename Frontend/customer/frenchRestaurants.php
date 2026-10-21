@@ -59,7 +59,7 @@
 <body>
 
 <div class="shell">
-    <?php include '../../includes/customer_sidebar.php'; ?> 
+
     <?php include '../../includes/custRest_sidebar.php'; ?>
     
     <div class="main">
