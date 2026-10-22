@@ -102,9 +102,10 @@ $customer_param = '?customer=' . urlencode($customer_id);
             </div>
         </div>
 
-        <a href="logout.php" class="logout-btn" onclick="return confirm('Log out from Souvré?')">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </a>
+       <a href="../auth/login.php" class="logout-btn"
+   onclick="if (confirm('Log out from Savouré?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+</a>
     </div>
 </aside>
 

@@ -70,6 +70,8 @@ require_once __DIR__ . '/../../includes/staff_context.php';
         .po-actions { display: flex; gap: 8px; margin-top: 4px; }
         .po-actions .btn { flex: 1; justify-content: center; }
     </style>
+      <script>const REQUIRED_ROLE = 'staff';</script>
+    <script src="../js/guard.js"></script>
 </head>
 <body>
 

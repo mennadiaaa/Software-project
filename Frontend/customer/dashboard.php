@@ -40,6 +40,8 @@
         .rec-btn { background: #1b2a4a; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; transition: background 0.2s; }
         .rec-btn:hover { background: #0f192d; }
     </style>
+      <script>const REQUIRED_ROLE = 'customer';</script>
+    <script src="../js/guard.js"></script>
 </head>
 <body>
 

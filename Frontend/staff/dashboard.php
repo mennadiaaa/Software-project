@@ -36,6 +36,8 @@ foreach ($tbl_rows as $t) { if (isset($tbl_count[$t[2]])) $tbl_count[$t[2]]++; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         .badge-clickable { cursor: pointer; user-select: none; }
     </style>
+      <script>const REQUIRED_ROLE = 'staff';</script>
+    <script src="../js/guard.js"></script>
 </head>
 <body>
 

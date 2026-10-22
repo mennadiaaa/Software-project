@@ -20,6 +20,8 @@ require_once __DIR__ . '/../../includes/staff_context.php';
         .tab.active .tab-badge { background: rgba(201,169,110,.35); color: rgba(214,201,182,.9); }
         .reqs { max-width: 760px; }
     </style>
+      <script>const REQUIRED_ROLE = 'staff';</script>
+    <script src="../js/guard.js"></script>
 </head>
 <body>
 

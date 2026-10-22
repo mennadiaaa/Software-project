@@ -85,9 +85,10 @@ $page = basename($_SERVER['PHP_SELF']);
                 <span class="staff-branch"><i class="fa-solid fa-utensils"></i> <?= htmlspecialchars($assigned_restaurant) ?></span>
             </div>
         </div>
-        <a href="#" class="logout-btn" onclick="return confirm('Log out?')">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </a>
+      <a href="../auth/login.php" class="logout-btn"
+   onclick="if (confirm('Log out?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+</a>
     </div>
 </aside>
 

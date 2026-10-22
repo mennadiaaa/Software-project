@@ -110,10 +110,11 @@ $customer_param = '?customer=' . urlencode($customer_id);
                 <span class="staff-branch"><i class="fa-solid fa-gem"></i> <?= htmlspecialchars($current_customer['loyalty']) ?></span>
             </div>
         </div>
-
-        <a href="logout.php" class="logout-btn" onclick="return confirm('Log out from Souvré?')">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </a>
+<a href="../auth/login.php" class="logout-btn"
+   onclick="if (confirm('Log out from Savouré?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+</a>
+      
     </div>
 </aside>
 
@@ -191,5 +192,9 @@ function toggleDropdown(button) {
 function switchCustomerAccount(id, ev) {
     if (ev) ev.preventDefault();
     document.cookie = "customer_account=" + encodeURIComponent(id) + ";path=/;max-age=31536000";
-    try { localStorage.setItem('customer_account', id);}
+    try { localStorage.setItem('customer_account', id); } catch (e) {}
+    const url = new URL(window.location.href);
+    url.searchParams.set('customer', id);
+    window.location.href = url.toString();
+}
 </script>

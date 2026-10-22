@@ -28,7 +28,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     overflow-x: hidden; }
 .main  { flex: 1; min-width: 0; margin-left: var(--sidebar); display: flex; flex-direction: column; width:calc(100% - var(--sidebar))}
 
-/* ---- Sidebar ---- */
+/* ---- Sideabar ---- */
 .sidebar {
   width: var(--sidebar);
   background: var(--navy-dk);

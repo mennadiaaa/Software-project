@@ -56,6 +56,8 @@
         .btn-rest-outline { background: transparent; color: #1b2a4a; border: 1px solid #1b2a4a; }
         .btn-rest-outline:hover { background: rgba(27, 42, 74, 0.05); }
     </style>
+      <script>const REQUIRED_ROLE = 'customer';</script>
+    <script src="../js/guard.js"></script>
 </head>
 <body>
 

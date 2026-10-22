@@ -133,6 +133,8 @@ $restaurant_name = $_GET['restaurant'] ?? 'The Revolving Restaurant';
         }
         .cart-close-mobile { display: none; background: rgba(255,255,255,.15); color: var(--ivory); width: 30px; height: 30px; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; border: none; }
     </style>
+      <script>const REQUIRED_ROLE = 'customer';</script>
+    <script src="../js/guard.js"></script>
 </head>
 <body>
 

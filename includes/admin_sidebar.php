@@ -77,7 +77,8 @@ $admin_param = '?admin=' . urlencode($admin_id);
         </div>
 
         <!-- Logout Link -->
-        <a href="logout.php" class="logout-btn" onclick="return confirm('Log out from Admin Portal?')">
+        <a href="../auth/login.php" class="logout-btn"
+           onclick="if (confirm('Log out from Admin Portal?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
     </div>

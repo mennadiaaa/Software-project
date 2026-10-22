@@ -22,7 +22,7 @@ require_once __DIR__ . '/../../includes/staff_context.php';
         }
         .res-banner::after { content: '⚜'; position: absolute; right: 24px; top: 50%; transform: translateY(-50%); font-size: 5rem; opacity: .05; }
         .banner-icon { width: 52px; height: 52px; background: rgba(201,169,110,.18); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--gold); flex-shrink: 0; }
-        .banner-title { font-family: var(--serif); font-size: 2rem; font-weight: 700; line-height: 1; }
+        .banner-titlea { font-family: var(--serif); font-size: 2rem; font-weight: 700; line-height: 1; }
         .banner-sub { font-size: .7rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: rgba(214,201,182,.6); margin-top: 3px; }
         .banner-stats { display: flex; gap: 28px; margin-left: auto; }
         .b-stat-val { display: block; font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--gold); line-height: 1; }
@@ -38,6 +38,9 @@ require_once __DIR__ . '/../../includes/staff_context.php';
         .st-select { padding: 5px 12px; border: 1.5px solid var(--beige); border-radius: 20px; font-size: .72rem; font-weight: 700; letter-spacing: .07em; font-family: var(--sans); cursor: pointer; outline: none; background: #fff; transition: border-color var(--t); }
         .st-select:focus { border-color: var(--navy); }
     </style>
+        <script>const REQUIRED_ROLE = 'staff';</script>
+    <script src="../js/guard.js"></script>
+
 </head>
 <body>
 
