@@ -54,29 +54,7 @@ $page = basename($_SERVER['PHP_SELF']);
         </a>
     </nav>
 
-<<<<<<< Updated upstream
-   <div class="sidebar-foot">
-        <div class="account-switch">
-            <div class="account-switch-title">Staff Account</div>
-            <div class="account-pills">
-                <a href="?staff=nour" onclick="switchStaffAccount('nour', event)" class="acc-pill <?= $staff_id === 'nour' ? 'active' : '' ?>" title="The Revolving Restaurant">
-                    <span class="acc-dot"></span> Nour
-                </a>
-                <a href="?staff=tarek" onclick="switchStaffAccount('tarek', event)" class="acc-pill <?= $staff_id === 'tarek' ? 'active' : '' ?>" title="Le Petite Chef">
-                    <span class="acc-dot"></span> Tarek
-                </a>
-                <a href="?staff=michael" onclick="switchStaffAccount('michael', event)" class="acc-pill <?= $staff_id === 'michael' ? 'active' : '' ?>" title="Mo Bistro">
-                    <span class="acc-dot"></span> Michael
-                </a>
-                <a href="?staff=pierre" onclick="switchStaffAccount('pierre', event)" class="acc-pill <?= $staff_id === 'pierre' ? 'active' : '' ?>" title="Le Petite Chef">
-                    <span class="acc-dot"></span> Pierre
-                </a>
-            </div>
-        </div> 
-
-=======
     <div class="sidebar-foot">
->>>>>>> Stashed changes
         <div class="staff-chip">
             <div class="avatar"><?= htmlspecialchars($current_staff['avatar']) ?></div>
             <div>
