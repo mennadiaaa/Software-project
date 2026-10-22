@@ -1,13 +1,6 @@
 <?php
 /**
- * Savouré – shared staff context (include with require_once on EVERY staff page + the sidebar).
- *
- * Decides which staff member is active and which restaurant they belong to, once, in one place.
- * Accepts every ID style used in the project:
- *   short ids      : nour, tarek, michael, pierre
- *   users.js ids   : staff_nour, staff_tarek, staff_02 (Pierre), staff_03 (Michael)
- *   restaurant name: ?restaurant=Mo Bistro
- *
+
  * Exposes: $staff_accounts, $staff_id, $current_staff, $assigned_restaurant, $staff_param,
  *          $SAVOURE_DATA, $pending_orders_count, $open_requests_count, $pending_reservations_count
  */

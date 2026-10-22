@@ -55,14 +55,20 @@ $page = basename($_SERVER['PHP_SELF']);
     </nav>
 
     <div class="sidebar-foot">
-        <div class="staff-chip">
+        <!-- Staff Chip – click to visit profile -->
+        <a href="profile.php<?= $staff_param ?>"
+           class="staff-chip"
+           title="View my profile"
+           style="text-decoration:none;display:flex;align-items:center;gap:10px;border-radius:12px;cursor:pointer;transition:background .2s;"
+           onmouseover="this.style.background='rgba(201,169,110,.08)'"
+           onmouseout="this.style.background=''">
             <div class="avatar"><?= htmlspecialchars($current_staff['avatar']) ?></div>
             <div>
                 <span class="staff-name"><?= htmlspecialchars($current_staff['name']) ?></span>
                 <span class="staff-role"><?= htmlspecialchars($current_staff['role']) ?></span>
                 <span class="staff-branch"><i class="fa-solid fa-utensils"></i> <?= htmlspecialchars($assigned_restaurant) ?></span>
             </div>
-        </div>
+        </a>
         <a href="../auth/login.php" class="logout-btn"
            onclick="if (confirm('Log out?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
             <i class="fa-solid fa-right-from-bracket"></i> Logout

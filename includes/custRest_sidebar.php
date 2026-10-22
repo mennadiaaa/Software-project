@@ -1,9 +1,8 @@
-<?php 
+﻿<?php 
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
 
-// 2 Customer accounts
 $customer_accounts = [
     'sarah' => [
         'id'         => 'sarah',
@@ -21,7 +20,6 @@ $customer_accounts = [
     ],
 ];
 
-// Switch account via URL query or fallback to session/cookie
 if (isset($_GET['customer']) && isset($customer_accounts[$_GET['customer']])) {
     $_SESSION['customer_account'] = $_GET['customer'];
 }
@@ -35,28 +33,27 @@ $_SESSION['customer_account'] = $customer_id;
 $current_customer = $customer_accounts[$customer_id];
 $page = basename($_SERVER['PHP_SELF']); 
 $category = $_GET['category'] ?? 'all';
+
 $is_restaurant_active = in_array($page, ['allRestaurants.php', 'internationalRestaurants.php', 'frenchRestaurants.php', 'egyptianRestaurants.php']);
 $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
 ?>
 <aside class="sidebar">
     <div class="brand">
         <div class="brand-mark">⚜</div>
-        <div>
-            <div class="brand-name">Savouré</div>
-            <div class="brand-sub">Guest Portal</div>
-        </div>
+         <div class="brand-name">Savouré</div>
+        <div class="brand-sub">Guest Portal</div>
+        
     </div>
 
     <nav>
         <div class="nav-label">Main Menu</div>
 
-        <!-- Dashboard Link -->
         <a href="dashboard.php<?= $customer_param ?>" class="nav-link <?= $page === 'dashboard.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-house"></i></span>
             Dashboard
         </a>
 
-        <!-- Restaurants Accordion / Submenu -->
+
         <div class="nav-group <?= $is_restaurant_active ? 'open' : '' ?>">
             <button type="button" class="nav-link dropdown-toggle <?= $is_restaurant_active ? 'active' : '' ?>" onclick="toggleDropdown(this)">
                 <span class="icon"><i class="fa-solid fa-utensils"></i></span>
@@ -71,7 +68,7 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
                     International
                 </a>
                 <a href="frenchRestaurants.php<?= $customer_param ?>" class="sub-link <?= ($page === 'frenchRestaurants.php') ? 'active' : '' ?>">
-                    🇫🇷 French
+                     🇫🇷 French
                 </a>
                 
                 <a href="egyptianRestaurants.php<?= $customer_param ?>" class="sub-link <?= ($page === 'egyptianRestaurants.php') ? 'active' : '' ?>">
@@ -80,7 +77,6 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
             </div>
         </div>
 
-        <!-- Bookings / Reservations -->
         <a href="my_bookings.php<?= $customer_param ?>" class="nav-link <?= $page === 'my_bookings.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-calendar-check"></i></span>
             My Bookings
@@ -93,7 +89,7 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
     </nav>
 
     <div class="sidebar-foot">
-        <!-- Customer Chip -->
+        <a href="profile.php<?= $customer_param ?>" class="profile-chip-link <?= $page === 'profile.php' ? 'active' : '' ?>">
         <div class="staff-chip customer-chip">
             <div class="avatar"><?= htmlspecialchars($current_customer['avatar']) ?></div>
             <div>
@@ -102,6 +98,7 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
                 <span class="staff-branch"><i class="fa-solid fa-gem"></i> <?= htmlspecialchars($current_customer['loyalty']) ?></span>
             </div>
         </div>
+        </a>
 
        <a href="../auth/login.php" class="logout-btn"
    onclick="if (confirm('Log out from Savouré?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
@@ -173,10 +170,12 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
     font-weight: 600;
     background: rgba(201,169,110,.15);
 }
+.profile-chip-link { display: block; text-decoration: none; border-radius: 12px; transition: all .2s ease; margin-bottom: 8px; }
+.profile-chip-link:hover .staff-chip, .profile-chip-link.active .staff-chip { background: rgba(201,169,110,.12); border: 1px solid rgba(201,169,110,.3); }
+.staff-chip { border: 1px solid transparent; border-radius: 12px; }
 </style>
 
 <script>
-// Toggle function that saves the open state to localStorage
 function toggleDropdown(button) {
     const navGroup = button.closest('.nav-group');
     navGroup.classList.toggle('open');
@@ -186,19 +185,16 @@ function toggleDropdown(button) {
     localStorage.setItem('savoure_restaurants_dropdown_open', isOpen ? 'true' : 'false');
 }
 
-// Restore state automatically when page loads
 document.addEventListener('DOMContentLoaded', () => {
     const navGroup = document.querySelector('.nav-group');
     if (!navGroup) return;
 
-    // Check if current page belongs to restaurant section
     const currentPath = window.location.pathname.toLowerCase();
     const isRestaurantPage = ['allrestaurants', 'restaurants', 'frenchrestaurants', 'egyptianrestaurants', 'internationalrestaurants']
         .some(page => currentPath.includes(page));
 
     const savedState = localStorage.getItem('savoure_restaurants_dropdown_open');
 
-    // Keep open if user manually opened it OR if currently on a restaurant page
     if (savedState === 'true' || isRestaurantPage) {
         navGroup.classList.add('open');
     }

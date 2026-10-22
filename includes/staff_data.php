@@ -1,9 +1,4 @@
 <?php
-/**
- * Single source of truth for per-restaurant mock data.
- * Every staff page AND the sidebar read from here, so they can never disagree.
- * Keys of each array are the exact restaurant names from staff_context.php.
- */
 return [
     'reservations' => [
                 'The Revolving Restaurant' => [

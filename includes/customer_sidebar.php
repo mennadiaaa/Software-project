@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
 
-// 2 Customer accounts
 $customer_accounts = [
     'sarah' => [
         'id'         => 'sarah',
@@ -21,7 +20,6 @@ $customer_accounts = [
     ],
 ];
 
-// Switch account via URL query or fallback to session/cookie
 if (isset($_GET['customer']) && isset($customer_accounts[$_GET['customer']])) {
     $_SESSION['customer_account'] =$_GET['customer'];
 }
@@ -48,13 +46,11 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
     <nav>
         <div class="nav-label">Main Menu</div>
 
-        <!-- Dashboard Link -->
         <a href="dashboard.php<?= $customer_param ?>" class="nav-link <?= $page === 'dashboard.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-house"></i></span>
             Dashboard
         </a>
 
-        <!-- Restaurants Accordion / Submenu -->
         <div class="nav-group <?= $page === 'restaurants.php' ? 'open' : '' ?>">
             <button type="button" class="nav-link dropdown-toggle <?= $page === 'restaurants.php' ? 'active' : '' ?>" onclick="toggleDropdown(this)">
                 <span class="icon"><i class="fa-solid fa-utensils"></i></span>
@@ -80,7 +76,6 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
             </div> -->
         </div>
 
-        <!-- Bookings / Reservations -->
         <a href="my_bookings.php<?= $customer_param ?>" class="nav-link <?= $page === 'my_bookings.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-calendar-check"></i></span>
             My Bookings
@@ -101,15 +96,21 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
             </div>
         </div> -->
 
-        <!-- Customer Chip -->
-        <div class="staff-chip customer-chip">
+        <!-- Customer Chip – click to visit profile -->
+        <a href="profile.php<?= $customer_param ?>"
+           class="staff-chip customer-chip"
+           title="View my profile"
+           style="text-decoration:none;display:flex;align-items:center;gap:10px;border-radius:12px;cursor:pointer;transition:background .2s;"
+           onmouseover="this.style.background='rgba(201,169,110,.08)'"
+           onmouseout="this.style.background=''">
             <div class="avatar"><?= htmlspecialchars($current_customer['avatar']) ?></div>
             <div>
                 <span class="staff-name"><?= htmlspecialchars($current_customer['name']) ?></span>
                 <span class="staff-role"><?= htmlspecialchars($current_customer['membership']) ?></span>
                 <span class="staff-branch"><i class="fa-solid fa-gem"></i> <?= htmlspecialchars($current_customer['loyalty']) ?></span>
             </div>
-        </div>
+        </a>
+
 <a href="../auth/login.php" class="logout-btn"
    onclick="if (confirm('Log out from Savouré?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
     <i class="fa-solid fa-right-from-bracket"></i> Logout
