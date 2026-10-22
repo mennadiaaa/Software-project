@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 // Resolves WHICH staff member is logged in (accepts nour / staff_nour / staff_03 / ?restaurant=...)
 // and exposes $staff_id, $current_staff, $assigned_restaurant, $staff_param, $SAVOURE_DATA, $pending_orders_count, $open_requests_count
 require_once __DIR__ . '/../../includes/staff_context.php';

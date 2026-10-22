@@ -34,7 +34,7 @@ $_SESSION['customer_account'] =$customer_id;
 $current_customer = $customer_accounts[$customer_id];
 $page = basename($_SERVER['PHP_SELF']); 
 $category =$_GET['category'] ?? 'all';
-$customer_param = '?customer=' . urlencode($customer_id);
+$customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
 ?>
 <aside class="sidebar">
     <div class="brand">
@@ -198,3 +198,4 @@ function switchCustomerAccount(id, ev) {
     window.location.href = url.toString();
 }
 </script>
+<script src="../js/customer_profile.js"></script>

@@ -5,10 +5,6 @@ $page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <style>
-/* Account switcher: 4 pills fit on one row, never overflow the sidebar */
-.sidebar .account-pills { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-.sidebar .acc-pill { min-width: 0; padding: 6px 4px !important; font-size: .66rem !important; justify-content: center; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sidebar .acc-pill .acc-dot { display: none; }
 /* Keep the footer visible: menu scrolls if the window is short */
 .sidebar nav { min-height: 0; overflow-y: auto; }
 .sidebar .nav-badge { margin-left: auto; }
@@ -58,6 +54,7 @@ $page = basename($_SERVER['PHP_SELF']);
         </a>
     </nav>
 
+<<<<<<< Updated upstream
    <div class="sidebar-foot">
         <div class="account-switch">
             <div class="account-switch-title">Staff Account</div>
@@ -77,6 +74,9 @@ $page = basename($_SERVER['PHP_SELF']);
             </div>
         </div> 
 
+=======
+    <div class="sidebar-foot">
+>>>>>>> Stashed changes
         <div class="staff-chip">
             <div class="avatar"><?= htmlspecialchars($current_staff['avatar']) ?></div>
             <div>
@@ -85,23 +85,15 @@ $page = basename($_SERVER['PHP_SELF']);
                 <span class="staff-branch"><i class="fa-solid fa-utensils"></i> <?= htmlspecialchars($assigned_restaurant) ?></span>
             </div>
         </div>
-      <a href="../auth/login.php" class="logout-btn"
-   onclick="if (confirm('Log out?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
-    <i class="fa-solid fa-right-from-bracket"></i> Logout
-</a>
+        <a href="../auth/login.php" class="logout-btn"
+           onclick="if (confirm('Log out?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
     </div>
 </aside>
 
 <script>
-/**
- * Live sidebar badges (shared by every staff page).
- *  Orders       = incoming orders + pending customer pre-orders (localStorage.savoure_preorders)
- *  Requests     = pending requests
- *  Reservations = reservations still "pending"
- * On a page that lists the items, the badge counts what is really on screen (so it drops the moment
- * you accept / answer / confirm); on other pages it starts from the server data.
- * A badge with 0 is hidden.
- */
+// Live sidebar badges (shared by every staff page).
 (function () {
     const REST = <?= json_encode($assigned_restaurant) ?>;
     const BASE = <?= json_encode([
@@ -138,24 +130,4 @@ $page = basename($_SERVER['PHP_SELF']);
     window.addEventListener('storage', refresh);
     setInterval(refresh, 1000);
 })();
-</script>
-
-<script>
-function switchStaffAccount(id, ev) {
-    if (ev) ev.preventDefault();
-    document.cookie = "staff_account=" + encodeURIComponent(id) + ";path=/;max-age=31536000";
-    try { 
-        localStorage.setItem('staff_account', id); 
-        const rests = {
-            'nour': 'The Revolving Restaurant',
-            'tarek': 'Le Petite Chef',
-            'michael': 'Mo Bistro',
-            'pierre': 'Le Petite Chef'
-        };
-        if (rests[id]) localStorage.setItem('savoure_active_restaurant', rests[id]);
-    } catch(e){}
-    const url = new URL(window.location.href);
-    url.searchParams.set('staff', id);
-    window.location.href = url.toString();
-}
 </script>

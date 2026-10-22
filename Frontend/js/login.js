@@ -1,14 +1,15 @@
+const SIGNUPS_KEY = 'savoure_signups';
+
 // "users" comes from includes/users.js ({ staff, customers, admins })
 function getAllUsers() {
   const fromFile = [...users.staff, ...users.customers, ...users.admins];
 
-  // also accept accounts saved in localStorage (e.g. future signups) that have a password
-  let fromStorage = [];
+  let fromSignups = [];
   try {
-    fromStorage = (JSON.parse(localStorage.getItem('savoure_users')) || []).filter(u => u.password);
+    fromSignups = (JSON.parse(localStorage.getItem(SIGNUPS_KEY)) || []).filter(u => u.password);
   } catch (e) {}
 
-  return [...fromFile, ...fromStorage];
+  return [...fromFile, ...fromSignups];
 }
 
 document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -23,14 +24,12 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
   }
 
   localStorage.setItem('savoure_current_user', JSON.stringify({ id: user.id, role: user.role }));
-const staffMap = { staff_nour: 'nour', staff_tarek: 'tarek', staff_02: 'pierre', staff_03: 'michael' };
 
-if (user.role === 'admin') {
-  location.href = '../admin/dashboard.php';
-} else if (user.role === 'staff') {
-  location.href = '../staff/dashboard.php?staff=' + encodeURIComponent(staffMap[user.id] || 'nour');
-} else {
-  location.href = '../customer/dashboard.php?customer=' + encodeURIComponent(user.id.replace('cust_', ''));
-}
-  
+  if (user.role === 'admin') {
+    location.href = '../admin/dashboard.php';
+  } else if (user.role === 'staff') {
+    location.href = '../staff/dashboard.php?staff=' + encodeURIComponent(user.id);
+  } else {
+    location.href = '../customer/dashboard.php?customer=' + encodeURIComponent(user.id.replace('cust_', ''));
+  }
 });

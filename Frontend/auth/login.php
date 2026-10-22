@@ -23,10 +23,11 @@
             <p id="login-error" style="color:#8B2635;font-size:.8rem;"></p>
         </div>
         <div class="modal-foot">
+            <a href="signup.php" style="margin-right:auto;font-size:.85rem;">Create account</a>
             <button type="submit" class="btn btn-primary">Login</button>
         </div>
     </form>
-       <script src="../../includes/users.js"></script>
+    <script src="../../includes/users.js"></script>
     <script src="../js/login.js"></script>
 </body>
 </html>
