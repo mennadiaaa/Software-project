@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .restaurants-section { margin-top: 12px; }
-        .rest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 18px; }
+        .rest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 360px)); justify-content: start; gap: 24px; margin-top: 18px; }
         
         .rest-card { 
             background: #ffffff; 
@@ -71,7 +71,7 @@
             <section class="restaurants-section">
                 <div class="section-head">
                     <div>
-                        <span class="section-eye" style="color: #a8843e; font-weight: 600; font-size: 0.8rem;">🌍 Global Gastronomy</span>
+                        <span class="section-eye" style="color: #a8843e; font-weight: 600; font-size: 0.8rem;"> Global Gastronomy</span>
                         <h2 class="section-title" style="margin-top: 2px;">International Restaurants</h2>
                     </div>
                 </div>

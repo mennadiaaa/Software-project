@@ -58,7 +58,7 @@ $page = basename($_SERVER['PHP_SELF']);
         </a>
     </nav>
 
-    <div class="sidebar-foot">
+   <div class="sidebar-foot">
         <div class="account-switch">
             <div class="account-switch-title">Staff Account</div>
             <div class="account-pills">
@@ -75,7 +75,7 @@ $page = basename($_SERVER['PHP_SELF']);
                     <span class="acc-dot"></span> Pierre
                 </a>
             </div>
-        </div>
+        </div> 
 
         <div class="staff-chip">
             <div class="avatar"><?= htmlspecialchars($current_staff['avatar']) ?></div>
