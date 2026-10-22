@@ -1,48 +1,25 @@
+<?php
+// Resolves WHICH staff member is logged in (accepts nour / staff_nour / staff_03 / ?restaurant=...)
+// and exposes $staff_id, $current_staff, $assigned_restaurant, $staff_param, $SAVOURE_DATA, $pending_orders_count, $open_requests_count
+require_once __DIR__ . '/../../includes/staff_context.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tables · Souvré Staff</title>
+    <title>Tables · Savouré Staff</title>
     <link rel="stylesheet" href="../styles/staff.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
 <div class="shell">
-    <?php include '../../includes/staff_sidebar.php'; ?>
+    <?php include __DIR__ . '/../../includes/staff_sidebar.php'; ?>
 
     <?php
-    $all_tables = [
-        'The Revolving Restaurant' => [
-            [1,2,'free',    ''],
-            [2,4,'reserved','Hassan, A.'],
-            [3,2,'occupied','El-Sayed, F.'],
-            [4,6,'free',    ''],
-            [5,4,'occupied','Mansour, O.'],
-            [6,2,'reserved','Karim, L.'],
-            [7,8,'free',    ''],
-            [8,4,'occupied','Ibrahim, K.'],
-            [9,2,'free',    ''],
-            [10,4,'reserved','Naguib, S.'],
-            [11,6,'occupied','Taha, M.'],
-            [12,2,'free',   ''],
-        ],
-        'Le Petite Chef' => [
-            [1,2,'reserved','El-Masry, M.'],
-            [2,4,'free',    ''],
-            [3,2,'occupied','Ghanem, N.'],
-            [4,6,'free',    ''],
-            [5,4,'reserved','Farouk, S.'],
-            [6,2,'occupied','Khattab, S.'],
-            [7,8,'free',    ''],
-            [8,4,'occupied','El-Kady, T.'],
-            [9,2,'free',    ''],
-            [10,4,'reserved','Radwan, D.'],
-            [11,6,'occupied','Fawzy, A.'],
-            [12,2,'free',   ''],
-        ],
-    ];
+    $all_tables = $SAVOURE_DATA['tables'];
     $tables = $all_tables[$assigned_restaurant] ?? $all_tables['The Revolving Restaurant'];
     $cnt_free = count(array_filter($tables, fn($t) => $t[2] === 'free'));
     $cnt_reserved = count(array_filter($tables, fn($t) => $t[2] === 'reserved'));
@@ -139,7 +116,10 @@
 </div>
 
 <div class="toast-zone" id="toasts"></div>
-
+<script>
+    window.SAVOURE_STAFF_ID = <?= json_encode($staff_id) ?>;
+    window.SAVOURE_STAFF_RESTAURANT = <?= json_encode($assigned_restaurant) ?>;
+</script>
 <script>
 let currentTable = null;
 

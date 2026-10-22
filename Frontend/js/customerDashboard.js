@@ -2,25 +2,88 @@
  * Savouré Customer Dashboard & Restaurant Portal Controller
  */
 
-// Recommended Plates Data (Dashboard)
-const RECOMMENDATIONS = [
+// Comprehensive Dish Pool derived from MENU_DATA
+const ALL_MENU_DISHES = [
+    // The Revolving Restaurant
     {
         restaurant: "The Revolving Restaurant",
-        dish: "Filet Mignon & Truffle Butter",
-        description: "Prime tenderloin steak served with roasted wild mushrooms and infused truffle butter.",
-        price: "1200 EGP"
+        dish: "Dry-Aged Rib Eye Steak",
+        description: "300g prime rib eye, truffle mashed potatoes, peppercorn jus.",
+        price: "1,650 EGP"
+    },
+    {
+        restaurant: "The Revolving Restaurant",
+        dish: "Pan-Seared Sea Bass",
+        description: "Sea bass fillet, lemon butter, sautéed spinach, crispy skin.",
+        price: "1,180 EGP"
+    },
+    {
+        restaurant: "The Revolving Restaurant",
+        dish: "Crab Bisque",
+        description: "Rich Egyptian crab bisque, cognac cream, crispy croutons.",
+        price: "620 EGP"
+    },
+    {
+        restaurant: "The Revolving Restaurant",
+        dish: "Grilled Shrimp & Coconut Sauce",
+        description: "Tiger prawns, coconut cream sauce, citrus zest.",
+        price: "780 EGP"
+    },
+    {
+        restaurant: "The Revolving Restaurant",
+        dish: "Duck Breast",
+        description: "Roasted duck breast, cherry reduction, seasonal vegetables.",
+        price: "1,380 EGP"
+    },
+    // Le Petite Chef
+    {
+        restaurant: "Le Petite Chef",
+        dish: "Classic Menu Experience",
+        description: "Buffalo Tomato Salad · Truffle Mushroom Ravioli · Beef Fillet & Vegetables · Japanese Mont Blanc",
+        price: "2,500 EGP"
     },
     {
         restaurant: "Le Petite Chef",
-        dish: "Bouillabaisse Marseillaise",
-        description: "Classic French seafood stew with saffron broth, tiger prawns, and sea bass.",
-        price: "1600 EGP"
+        dish: "Premium Menu Experience",
+        description: "Buffalo Tomato Salad · Truffle Mushroom Ravioli · Beef Fillet & Grilled Shrimp · Japanese Mont Blanc",
+        price: "3,500 EGP"
+    },
+    {
+        restaurant: "Le Petite Chef",
+        dish: "Vegetarian Menu Experience",
+        description: "Buffalo Tomato Salad · Truffle Mushroom Ravioli · Vegetable & Nut Wellington · Japanese Mont Blanc",
+        price: "2,500 EGP"
+    },
+    // Mo Bistro
+    {
+        restaurant: "Mo Bistro",
+        dish: "Lamb Shank",
+        description: "Slow-braised lamb shank, spiced brown rice, rich pan jus. (Guest favourite)",
+        price: "890 EGP"
     },
     {
         restaurant: "Mo Bistro",
-        dish: "Slow-Cooked Short Rib Risotto",
-        description: "Creamy Parmesan risotto topped with 12-hour braised beef short rib and red wine reduction.",
-        price: "560 EGP"
+        dish: "Mushroom Risotto",
+        description: "Creamy wild mushroom risotto, aged parmesan, truffle oil.",
+        price: "520 EGP"
+    },
+    {
+        restaurant: "Mo Bistro",
+        dish: "Steak Flank",
+        description: "Grilled flank steak, chimichurri, roasted potatoes.",
+        price: "780 EGP"
+    },
+    {
+        restaurant: "Mo Bistro",
+        dish: "Shrimp Cocktail",
+        description: "Chilled tiger prawns, Marie Rose sauce, lemon.",
+        price: "420 EGP"
+    },
+    {
+        restaurant: "Mo Bistro",
+        dish: "Chinese Beef Noodles",
+        description: "Wok-tossed beef noodles, soy, ginger, spring onion.",
+        price: "580 EGP"
     }
 ];
 
@@ -72,13 +135,33 @@ function tick() {
     }
 }
 
+/**
+ * Computes 3 dishes based on the current 2-hour interval.
+ */
+function getRotatedRecommendations() {
+    const TWO_HOURS_MS = 1000 * 60 * 60 * 2; // 7,200,000 ms
+    const timeBlockIndex = Math.floor(Date.now() / TWO_HOURS_MS);
+
+    const numberOfRecs = 3;
+    const selectedDishes = [];
+
+    for (let i = 0; i < numberOfRecs; i++) {
+        const index = (timeBlockIndex + i) % ALL_MENU_DISHES.length;
+        selectedDishes.push(ALL_MENU_DISHES[index]);
+    }
+
+    return selectedDishes;
+}
+
 // Render Recommendation Cards (Dashboard View)
 function renderRecommendations() {
     const grid = document.getElementById('recs-grid');
     if (!grid) return;
 
+    const currentRecs = getRotatedRecommendations();
+
     grid.innerHTML = '';
-    RECOMMENDATIONS.forEach(rec => {
+    currentRecs.forEach(rec => {
         const card = document.createElement('div');
         card.className = 'rec-card';
         const menuUrl = `menu.php?restaurant=${encodeURIComponent(rec.restaurant)}&customer=${currentCustomerParam()}`;
@@ -155,6 +238,10 @@ function renderRestaurantCards() {
 document.addEventListener('DOMContentLoaded', () => {
     tick();
     setInterval(tick, 1000);
+    
     renderRecommendations();
     renderRestaurantCards();
+
+    // Check every 60 seconds to re-render if the 2-hour window shifted while open
+    setInterval(renderRecommendations, 60000);
 });

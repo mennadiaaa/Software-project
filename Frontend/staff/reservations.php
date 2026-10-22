@@ -1,9 +1,15 @@
+<?php
+// Resolves WHICH staff member is logged in (accepts nour / staff_nour / staff_03 / ?restaurant=...)
+// and exposes $staff_id, $current_staff, $assigned_restaurant, $staff_param, $SAVOURE_DATA, $pending_orders_count, $open_requests_count
+require_once __DIR__ . '/../../includes/staff_context.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservations · Souvré Staff</title>
+    <title>Reservations · Savouré Staff</title>
     <link rel="stylesheet" href="../styles/staff.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -36,7 +42,7 @@
 <body>
 
 <div class="shell">
-    <?php include '../../includes/staff_sidebar.php'; ?>
+    <?php include __DIR__ . '/../../includes/staff_sidebar.php'; ?>
 
     <div class="main">
         <header class="topbar">
@@ -56,24 +62,7 @@
 
             <?php
             // Mock reservations data per restaurant
-            $all_reservations = [
-                'The Revolving Restaurant' => [
-                    ['R-2201','18:30','Hassan, Ahmed',   2,'T-02','+20 100 234 5678','',                      'confirmed'],
-                    ['R-2202','19:00','El-Sayed, Fatima',2,'T-06','+20 100 987 6543','Garlic allergy noted',   'confirmed'],
-                    ['R-2203','19:30','Mansour, Omar',   4,'T-10','+20 101 555 4433','Window seat preferred',  'confirmed'],
-                    ['R-2204','20:00','Karim, Leila',    3,'T-04','+20 102 111 2233','Business dinner',        'pending'],
-                    ['R-2205','20:30','Ibrahim, Khaled', 6,'T-07','+20 100 778 8900','Birthday celebration',   'confirmed'],
-                    ['R-2206','21:00','Naguib, Sara',    2,'T-01','+20 101 447 5566','',                       'confirmed'],
-                ],
-                'Le Petite Chef' => [
-                    ['R-3101','18:00','El-Masry, Mostafa', 2,'T-01','+20 109 456 7812','Anniversary dinner',       'confirmed'],
-                    ['R-3102','18:45','Ghanem, Nourhan',   4,'T-03','+20 106 321 4455','Allergy: gluten-free',     'confirmed'],
-                    ['R-3103','19:15','Farouk, Sherif',    2,'T-05','+20 101 887 5522','VIP guest',                'pending'],
-                    ['R-3104','20:00','Khattab, Salma',    3,'T-08','+20 100 665 9933','Table near animation',     'confirmed'],
-                    ['R-3105','20:30','El-Kady, Tamer',    5,'T-09','+20 102 774 1188','Family celebration',       'confirmed'],
-                    ['R-3106','21:15','Radwan, Dina',      2,'T-02','+20 103 992 3344','Quiet corner requested',   'confirmed'],
-                ],
-            ];
+            $all_reservations = $SAVOURE_DATA['reservations'];
 
             $data = $all_reservations[$assigned_restaurant] ?? $all_reservations['The Revolving Restaurant'];
             $confirmed_count = 0;
@@ -88,7 +77,7 @@
             <div class="res-banner">
                 <div class="banner-icon"><i class="fa-solid fa-calendar-star"></i></div>
                 <div>
-                    <div class="banner-title">Tuesday, October 14</div>
+                    <div class="banner-title"><?= date('l, F j') ?></div>
                     <div class="banner-sub">Evening Service · <?= htmlspecialchars($assigned_restaurant) ?>, Cairo</div>
                 </div>
                 <div class="banner-stats">
@@ -171,7 +160,10 @@
 </div>
 
 <div class="toast-zone" id="toasts"></div>
-
+<script>
+    window.SAVOURE_STAFF_ID = <?= json_encode($staff_id) ?>;
+    window.SAVOURE_STAFF_RESTAURANT = <?= json_encode($assigned_restaurant) ?>;
+</script>
 <script>
 (function tick() {
     const d = new Date(), p = n => String(n).padStart(2,'0');

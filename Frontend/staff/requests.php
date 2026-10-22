@@ -1,9 +1,15 @@
+<?php
+// Resolves WHICH staff member is logged in (accepts nour / staff_nour / staff_03 / ?restaurant=...)
+// and exposes $staff_id, $current_staff, $assigned_restaurant, $staff_param, $SAVOURE_DATA, $pending_orders_count, $open_requests_count
+require_once __DIR__ . '/../../includes/staff_context.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Requests · Souvré Staff</title>
+    <title>Requests · Savouré Staff</title>
     <link rel="stylesheet" href="../styles/staff.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -18,81 +24,10 @@
 <body>
 
 <div class="shell">
-    <?php include '../../includes/staff_sidebar.php'; ?>
+    <?php include __DIR__ . '/../../includes/staff_sidebar.php'; ?>
 
     <?php
-    $all_requests = [
-        'The Revolving Restaurant' => [
-            [
-                'id' => 101,
-                'table' => 3,
-                'guest' => 'El-Sayed, Fatima',
-                'status' => 'pending',
-                'border_color' => '',
-                'text' => 'Please no garlic in any dish — I have a serious intolerance. Thank you.',
-                'time' => 'Received at 20:09',
-                'tag' => null,
-                'reply' => '',
-            ],
-            [
-                'id' => 102,
-                'table' => 3,
-                'guest' => 'El-Sayed, Fatima',
-                'status' => 'pending',
-                'border_color' => 'var(--navy)',
-                'text' => "It's our anniversary — could you set up the table with candles and a small arrangement before we arrive?",
-                'time' => 'Received at 17:40',
-                'tag' => ['icon' => 'fa-heart', 'name' => 'Anniversary', 'bg' => 'rgba(255,105,135,.1)', 'color' => '#C0415B'],
-                'reply' => '',
-            ],
-            [
-                'id' => 100,
-                'table' => 8,
-                'guest' => 'Ibrahim, Khaled',
-                'status' => 'answered',
-                'border_color' => '#2D7A5F',
-                'text' => 'Could we get extra baladi bread with the meal, please?',
-                'time' => 'Received at 18:10 · Answered at 18:15',
-                'tag' => null,
-                'reply' => 'Absolutely — extra bread is on its way. Enjoy your meal, Mr. Ibrahim!',
-            ],
-        ],
-        'Le Petite Chef' => [
-            [
-                'id' => 201,
-                'table' => 1,
-                'guest' => 'El-Masry, Mostafa',
-                'status' => 'pending',
-                'border_color' => 'var(--navy)',
-                'text' => "It's our anniversary dinner — could you please ensure the table projector angle is focused clearly on our plates? Thank you.",
-                'time' => 'Received at 20:15',
-                'tag' => ['icon' => 'fa-heart', 'name' => 'Anniversary', 'bg' => 'rgba(255,105,135,.1)', 'color' => '#C0415B'],
-                'reply' => '',
-            ],
-            [
-                'id' => 202,
-                'table' => 3,
-                'guest' => 'Ghanem, Nourhan',
-                'status' => 'pending',
-                'border_color' => '',
-                'text' => 'Gluten allergy noted on reservation — please ensure the chef prepares gluten-free bread rolls for our table.',
-                'time' => 'Received at 19:50',
-                'tag' => ['icon' => 'fa-wheat-awn-circle-exclamation', 'name' => 'Dietary', 'bg' => 'rgba(201,169,110,.15)', 'color' => '#A8843E'],
-                'reply' => '',
-            ],
-            [
-                'id' => 200,
-                'table' => 9,
-                'guest' => 'El-Kady, Tamer',
-                'status' => 'answered',
-                'border_color' => '#2D7A5F',
-                'text' => 'Could we have warm damp towels brought to the table before dessert?',
-                'time' => 'Received at 18:30 · Answered at 18:34',
-                'tag' => null,
-                'reply' => 'Certainly, Mr. El-Kady — warm lemon-scented towels are being prepared for your table now.',
-            ],
-        ],
-    ];
+    $all_requests = $SAVOURE_DATA['requests'];
 
     $req_list = $all_requests[$assigned_restaurant] ?? $all_requests['The Revolving Restaurant'];
     $pending_count  = count(array_filter($req_list, fn($r) => $r['status'] === 'pending'));
@@ -180,7 +115,10 @@
 </div>
 
 <div class="toast-zone" id="toasts"></div>
-
+<script>
+    window.SAVOURE_STAFF_ID = <?= json_encode($staff_id) ?>;
+    window.SAVOURE_STAFF_RESTAURANT = <?= json_encode($assigned_restaurant) ?>;
+</script>
 <script>
 (function tick() {
     const d = new Date(), p = n => String(n).padStart(2,'0');

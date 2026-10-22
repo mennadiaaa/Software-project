@@ -1,9 +1,15 @@
+<?php
+// Resolves WHICH staff member is logged in (accepts nour / staff_nour / staff_03 / ?restaurant=...)
+// and exposes $staff_id, $current_staff, $assigned_restaurant, $staff_param, $SAVOURE_DATA, $pending_orders_count, $open_requests_count
+require_once __DIR__ . '/../../includes/staff_context.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders · Souvré Staff</title>
+    <title>Orders · Savouré Staff</title>
     <link rel="stylesheet" href="../styles/staff.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -68,117 +74,10 @@
 <body>
 
 <div class="shell">
-    <?php include '../../includes/staff_sidebar.php'; ?>
+    <?php include __DIR__ . '/../../includes/staff_sidebar.php'; ?>
 
     <?php
-    $all_orders = [
-        'The Revolving Restaurant' => [
-            'incoming' => [
-                [
-                    'id' => 1042,
-                    'table' => 3,
-                    'time' => '20:14',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'Chicken Caesar Salad', 'price' => '600 EGP'],
-                        ['qty' => 1, 'name' => 'Grilled Lobster', 'price' => '2500 EGP'],
-                        ['qty' => 2, 'name' => 'Chocolate Fondant', 'price' => '800 EGP'],
-                    ],
-                    'total' => '3900 EGP',
-                ],
-                [
-                    'id' => 1043,
-                    'table' => 7,
-                    'time' => '20:18',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'Shrimp Bisque', 'price' => '700 EGP'],
-                        ['qty' => 1, 'name' => 'Land & Sea', 'price' => '3600 EGP'],
-                        ['qty' => 1, 'name' => 'Fine Apple Tart', 'price' => '375 EGP'],
-                    ],
-                    'total' => '4675 EGP',
-                ],
-            ],
-            'active' => [
-                [
-                    'id' => 1038,
-                    'table' => 5,
-                    'time' => '19:52',
-                    'step' => 1,
-                    'status' => 'Preparing',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'Baked Onion Soup', 'price' => '570 EGP'],
-                        ['qty' => 2, 'name' => 'Rib Eye', 'price' => '3000 EGP'],
-                        ['qty' => 2, 'name' => 'Creme Brulee', 'price' => '650 EGP'],
-                    ],
-                    'total' => '4220 EGP',
-                ],
-                [
-                    'id' => 1040,
-                    'table' => 11,
-                    'time' => '19:30',
-                    'step' => 2,
-                    'status' => 'Ready',
-                    'items' => [
-                        ['qty' => 2, 'name' => 'Truffle Mashed Potatoes', 'price' => '900 EGP'],
-                        ['qty' => 1, 'name' => 'Mushroom Risotto', 'price' => '500 EGP'],
-                    ],
-                    'total' => '1400 EGP',
-                ],
-            ],
-        ],
-        'Le Petite Chef' => [
-            'incoming' => [
-                [
-                    'id' => 2081,
-                    'table' => 2,
-                    'time' => '20:22',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'French Onion Soup', 'price' => '550 EGP'],
-                        ['qty' => 1, 'name' => 'Pan-Seared Sea Bass', 'price' => '2100 EGP'],
-                        ['qty' => 2, 'name' => 'Vanilla Crème Brûlée', 'price' => '700 EGP'],
-                    ],
-                    'total' => '3350 EGP',
-                ],
-                [
-                    'id' => 2084,
-                    'table' => 5,
-                    'time' => '20:30',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'Shrimp Cocktail', 'price' => '680 EGP'],
-                        ['qty' => 1, 'name' => 'Wagyu Beef Tenderloin', 'price' => '3800 EGP'],
-                        ['qty' => 1, 'name' => 'Chocolate Soufflé', 'price' => '600 EGP'],
-                    ],
-                    'total' => '5080 EGP',
-                ],
-            ],
-            'active' => [
-                [
-                    'id' => 2077,
-                    'table' => 4,
-                    'time' => '19:48',
-                    'step' => 1,
-                    'status' => 'Preparing',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'Wild Mushroom Cappuccino', 'price' => '580 EGP'],
-                        ['qty' => 2, 'name' => 'Duck Confit', 'price' => '2600 EGP'],
-                        ['qty' => 2, 'name' => 'Tarte Tatin', 'price' => '720 EGP'],
-                    ],
-                    'total' => '3900 EGP',
-                ],
-                [
-                    'id' => 2079,
-                    'table' => 8,
-                    'time' => '19:35',
-                    'step' => 2,
-                    'status' => 'Ready',
-                    'items' => [
-                        ['qty' => 1, 'name' => 'Truffle Risotto', 'price' => '950 EGP'],
-                        ['qty' => 1, 'name' => 'Grilled Salmon Fillet', 'price' => '1800 EGP'],
-                    ],
-                    'total' => '2750 EGP',
-                ],
-            ],
-        ],
-    ];
+    $all_orders = $SAVOURE_DATA['orders'];
 
     $res_orders = $all_orders[$assigned_restaurant] ?? $all_orders['The Revolving Restaurant'];
     $incoming_orders = $res_orders['incoming'];
@@ -436,6 +335,10 @@ function toast(msg, type='') {
     z.appendChild(t);
     setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 300); }, 3800);
 }
+</script>
+<script>
+    window.SAVOURE_STAFF_ID = <?= json_encode($staff_id) ?>;
+    window.SAVOURE_STAFF_RESTAURANT = <?= json_encode($assigned_restaurant) ?>;
 </script>
 <script src="../js/staffPreorders.js"></script>
 </body>
