@@ -76,9 +76,13 @@ $customer_param = '?customer=' . urlencode($_GET['customer'] ?? $customer_id);
             </div> -->
         </div>
 
-        <a href="my_bookings.php<?= $customer_param ?>" class="nav-link <?= $page === 'my_bookings.php' ? 'active' : '' ?>">
+        <a href="Mybookings.php<?= $customer_param ?>" class="nav-link <?= $page === 'Mybookings.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-calendar-check"></i></span>
             My Bookings
+        </a>
+        <a href="Reservation.php<?= $customer_param ?>" class="nav-link <?= $page === 'Reservation.php' ? 'active' : '' ?>">
+            <span class="icon"><i class="fa-solid fa-calendar-plus"></i></span>
+            Make a Reservation
         </a>
     </nav>
 

@@ -1,0 +1,94 @@
+/* Savouré — My Bookings (extends customer.css) */
+
+.bk-list { display: flex; flex-direction: column; gap: 16px; }
+
+/* ---- Booking card ---- */
+.bk-card {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  background: #fff;
+  border: 1px solid var(--cream);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow var(--t);
+}
+.bk-card:hover { box-shadow: 0 6px 22px rgba(31,42,68,.12); }
+
+/* Date block */
+.bk-date {
+  background: var(--navy);
+  color: var(--ivory);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 16px 8px;
+  text-align: center;
+}
+.bk-day  { font-family: var(--serif); font-size: 2.4rem; font-weight: 700; line-height: 1; color: var(--gold); }
+.bk-mon  { font-size: .8rem; font-weight: 600; margin-top: 4px; }
+.bk-year { font-size: .68rem; opacity: .6; }
+
+.bk-card.is-past .bk-date,
+.bk-card.is-cancelled .bk-date { background: var(--beige); color: var(--navy); }
+.bk-card.is-past .bk-day,
+.bk-card.is-cancelled .bk-day { color: var(--navy); }
+.bk-card.is-cancelled .bk-name { text-decoration: line-through; opacity: .6; }
+
+/* Body */
+.bk-main { padding: 18px 22px; min-width: 0; }
+.bk-top  { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.bk-name { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; color: var(--navy); line-height: 1.15; }
+
+.bk-facts { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: .84rem; }
+.bk-facts li { display: flex; align-items: center; gap: 7px; }
+.bk-facts i  { color: var(--gold-dk); width: 14px; text-align: center; }
+
+.bk-notes {
+  margin-top: 12px; padding: 9px 13px;
+  background: var(--ivory); border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: .82rem; font-style: italic; line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Side */
+.bk-side {
+  padding: 18px 22px;
+  border-left: 1px solid var(--cream);
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 14px;
+}
+.bk-ref-label { display: block; font-size: .6rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--beige); text-align: right; }
+.bk-ref       { font-weight: 600; color: var(--navy); font-size: .9rem; letter-spacing: .04em; }
+.bk-actions   { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* Empty state */
+.bk-empty {
+  text-align: center; padding: 56px 24px;
+  background: #fff; border: 1.5px dashed var(--beige); border-radius: 14px;
+}
+.bk-empty-icon {
+  width: 56px; height: 56px; margin: 0 auto 14px;
+  background: var(--cream); color: var(--navy); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.bk-empty h3 { font-family: var(--serif); font-size: 1.35rem; color: var(--navy); margin-bottom: 6px; }
+.bk-empty p  { font-size: .86rem; opacity: .65; margin-bottom: 18px; }
+
+/* Modal text */
+.bk-modal-text { font-size: .9rem; line-height: 1.7; }
+.bk-modal-text strong { color: var(--navy); }
+
+/* Keyboard focus */
+.bk-card .btn:focus-visible,
+.filter-btn:focus-visible,
+.modal-close:focus-visible { outline: 2px solid var(--gold-dk); outline-offset: 2px; }
+
+/* ---- Responsive ---- */
+@media (max-width: 1200px) { .bk-stats { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 700px) {
+  .bk-card { grid-template-columns: 1fr; }
+  .bk-date { flex-direction: row; gap: 8px; justify-content: flex-start; padding: 10px 18px; }
+  .bk-day  { font-size: 1.5rem; }
+  .bk-side { border-left: none; border-top: 1px solid var(--cream); flex-direction: row; align-items: center; }
+  .bk-ref-label { text-align: left; }
+}
