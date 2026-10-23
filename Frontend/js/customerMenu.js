@@ -1,11 +1,9 @@
 /**
  * Savouré — Restaurant Menu + In-Page Cart (Phase 1: localStorage)
  * - Cart is namespaced per customer: savoure_cart::<customerId>
- * - Customer reservations are namespaced: savoure_customer_reservations::<customerId>
- * - Dine-In pre-orders require an existing, non-cancelled, future-or-today reservation
- *   at the same restaurant.
  * - Pre-orders are written to a single shared array (savoure_preorders) with the
  *   customer tag inside, so staff can see all customers for their restaurant.
+ * - Pickup-only for now. Dine-in will return with the reservations flow.
  */
 
 const MENU_DATA = {
@@ -110,18 +108,12 @@ const MENU_DATA = {
 
 const ORDERS_KEY = 'savoure_preorders';
 
-let currentFulfillment = 'pickup';
-let hasReservation = false;
-
 /* ---------- Per-customer storage keys ---------- */
 function currentCustomer() {
     return window.SAVOURE_CUSTOMER || 'guest';
 }
 function cartKey() {
     return 'savoure_cart::' + currentCustomer();
-}
-function customerResKey() {
-    return 'savoure_customer_reservations::' + currentCustomer();
 }
 
 /* ---------- Cart storage ---------- */
@@ -161,51 +153,6 @@ function getRestaurantCart() {
         if (v.restaurant === restaurant) out[k] = v;
     });
     return out;
-}
-
-/* ---------- Reservations check ---------- */
-function getCustomerReservations() {
-    try {
-        const raw = localStorage.getItem(customerResKey());
-        if (raw) return JSON.parse(raw);
-
-        // Legacy migration (same rule as the cart)
-        if (currentCustomer() === 'sarah') {
-            const legacy = localStorage.getItem('savoure_customer_reservations');
-            if (legacy) {
-                const parsed = JSON.parse(legacy);
-                localStorage.setItem(customerResKey(), JSON.stringify(parsed));
-                localStorage.removeItem('savoure_customer_reservations');
-                return parsed;
-            }
-        }
-        return [];
-    } catch(e) { return []; }
-}
-
-/**
- * Active reservations for the current customer at the current restaurant,
- * on today or a future date, not cancelled / declined.
- */
-function getActiveReservationsForCurrentRestaurant() {
-    const restaurant = window.SAVOURE_RESTAURANT;
-    const customer = currentCustomer();
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-
-    return getCustomerReservations().filter(r => {
-        if (r.restaurant !== restaurant) return false;
-        if (r.customer && r.customer !== customer) return false;
-        if (r.status === 'cancelled' || r.status === 'declined') return false;
-        if (!r.date) return false;
-        const d = new Date(r.date);
-        if (isNaN(d.getTime())) return false;
-        d.setHours(0, 0, 0, 0);
-        return d >= today;
-    });
-}
-
-function hasUpcomingReservation() {
-    return getActiveReservationsForCurrentRestaurant().length > 0;
 }
 
 /* ---------- Menu rendering ---------- */
@@ -311,10 +258,6 @@ function renderCart() {
     totalEl.textContent = totalPrice.toLocaleString() + ' EGP';
     placeBtn.disabled = totalQty === 0;
 
-    // Recompute reservation availability + update Dine-In tab
-    hasReservation = hasUpcomingReservation();
-    updateDineInTab();
-
     if (lines.length === 0) {
         bodyEl.innerHTML = `
             <div class="cart-empty">
@@ -346,69 +289,12 @@ function renderCart() {
     });
 }
 
-/**
- * Enable / disable the Dine-In tab based on reservation presence.
- * If no reservation: tab disabled + a hint appears below the tabs.
- */
-function updateDineInTab() {
-    const dineInTab = document.querySelector('.fulfill-tab[data-type="dinein"]');
-    const hint = document.getElementById('dinein-hint');
-
-    if (!dineInTab) return;
-
-    if (hasReservation) {
-        dineInTab.disabled = false;
-        dineInTab.classList.remove('disabled');
-        dineInTab.removeAttribute('title');
-        if (hint) hint.style.display = 'none';
-    } else {
-        dineInTab.disabled = true;
-        dineInTab.classList.add('disabled');
-        dineInTab.setAttribute('title', 'Make a reservation first');
-
-        // If user was on dine-in and lost eligibility, snap back to pickup
-        if (currentFulfillment === 'dinein') {
-            currentFulfillment = 'pickup';
-            document.querySelectorAll('.fulfill-tab').forEach(t => t.classList.remove('active'));
-            const pickupTab = document.querySelector('.fulfill-tab[data-type="pickup"]');
-            if (pickupTab) pickupTab.classList.add('active');
-            const pickupFields = document.getElementById('pickup-fields');
-            const dineinFields = document.getElementById('dinein-fields');
-            if (pickupFields) pickupFields.style.display = 'block';
-            if (dineinFields) dineinFields.style.display = 'none';
-        }
-
-        if (hint) hint.style.display = 'flex';
-    }
-}
-
-/* ---------- Fulfillment switch ---------- */
-function selectFulfillment(type, el) {
-    if (type === 'dinein' && !hasReservation) {
-        showMenuToast('You need a reservation to order for dine-in.', 'error');
-        return;
-    }
-    currentFulfillment = type;
-    document.querySelectorAll('.fulfill-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('pickup-fields').style.display = type === 'pickup' ? 'block' : 'none';
-    document.getElementById('dinein-fields').style.display = type === 'dinein' ? 'block' : 'none';
-    attachAutoGrow(document.getElementById('dinein-notes'));
-}
-
-/* ---------- Place pre-order ---------- */
+/* ---------- Place pre-order (pickup only) ---------- */
 function placePreOrder() {
     const restaurantCart = getRestaurantCart();
     const lines = Object.entries(restaurantCart);
 
     if (lines.length === 0) return;
-
-    // Guard: dine-in must have a reservation
-    if (currentFulfillment === 'dinein' && !hasUpcomingReservation()) {
-        showMenuToast('Dine-in pre-orders require a reservation at this restaurant.', 'error');
-        updateDineInTab();
-        return;
-    }
 
     let total = 0;
     const items = lines.map(([k, v]) => {
@@ -420,22 +306,13 @@ function placePreOrder() {
         id: 'pre_' + Date.now(),
         restaurant: window.SAVOURE_RESTAURANT,
         customer: currentCustomer(),
-        type: currentFulfillment,
+        type: 'pickup',
         items: items,
         total: total,
         status: 'pending',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        pickupTime: document.getElementById('pickup-time').value
     };
-
-    if (currentFulfillment === 'pickup') {
-        order.pickupTime = document.getElementById('pickup-time').value;
-    } else {
-        const activeRes = getActiveReservationsForCurrentRestaurant();
-        order.reservationId = activeRes[0] ? activeRes[0].id : null;
-        order.arrivalTime = document.getElementById('dinein-time').value;
-        order.partySize = document.getElementById('dinein-party').value;
-        order.notes = document.getElementById('dinein-notes').value.trim();
-    }
 
     // Save to shared preorders list (staff side reads this, filtered by restaurant)
     const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
@@ -462,7 +339,7 @@ function showConfirmation(order, total) {
                 Order <strong>${order.id}</strong>
             </div>
             <div style="font-size:.78rem;color:var(--charcoal);opacity:.7;margin-bottom:16px;">
-                ${order.type === 'pickup' ? 'Pickup at ' + order.pickupTime : 'Dine-In · ' + order.partySize + ' guests at ' + order.arrivalTime}
+                Pickup at ${order.pickupTime}
             </div>
             <div style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold-dk);">
                 ${total.toLocaleString()} EGP
@@ -475,19 +352,6 @@ function showConfirmation(order, total) {
         foot.style.display = 'block';
         renderCart();
     }, 5000);
-}
-
-/* ---------- Textarea auto-grow (bounded inside card) ---------- */
-function attachAutoGrow(ta) {
-    if (!ta || ta.dataset.autogrow === '1') return;
-    ta.dataset.autogrow = '1';
-    const maxH = 140;
-    const fit = () => {
-        ta.style.height = 'auto';
-        ta.style.height = Math.min(ta.scrollHeight, maxH) + 'px';
-    };
-    ta.addEventListener('input', fit);
-    setTimeout(fit, 0);
 }
 
 /* ---------- Mobile cart drawer ---------- */
@@ -517,5 +381,4 @@ function showMenuToast(msg, type = 'success') {
 document.addEventListener('DOMContentLoaded', () => {
     renderMenu();
     renderCart();
-    attachAutoGrow(document.getElementById('dinein-notes'));
 });
