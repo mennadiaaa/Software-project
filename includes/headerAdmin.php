@@ -3,7 +3,8 @@ $admin_page_titles = [
     'dashboard.php' => 'Admin Dashboard',
     'user_management.php' => 'User Management',
     'restaurant_management.php' => 'Restaurant Management',
-    'analytics.php' => 'Analytics Overview'
+    'analytics.php' => 'Analytics Overview',
+    'profile.php' => 'My Profile'
 ];
 $current_page_name = basename($_SERVER['PHP_SELF']);
 $page_display_title = $admin_page_titles[$current_page_name] ?? 'Admin Portal';
