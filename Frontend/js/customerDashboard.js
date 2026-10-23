@@ -225,7 +225,7 @@ function renderRestaurantCards() {
                     </div>
                     <div class="rest-footer">
                         <a href="menu.php?restaurant=${encodeURIComponent(rest.name)}&customer=${custParam}" class="btn-rest btn-rest-outline">View Menu</a>
-                        <a href="reserve.php?restaurant=${encodeURIComponent(rest.name)}&customer=${custParam}" class="btn-rest btn-rest-primary">Reserve Table</a>
+                       <a href="Reservation.php?restaurant=${encodeURIComponent(rest.name)}&customer=${custParam}" class="btn-rest btn-rest-primary">Reserve Table</a>
                     </div>
                 </div>
             </div>

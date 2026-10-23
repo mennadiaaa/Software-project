@@ -347,14 +347,33 @@
     $('btn-again').addEventListener('click', resetFlow);
   }
 
+  /* ---------- Preselect restaurant from ?restaurant=... ---------- */
+function preselectRestaurant() {
+  var wanted = new URLSearchParams(window.location.search).get('restaurant');
+  if (!wanted) return false;
+  wanted = wanted.trim().toLowerCase();
+
+  for (var i = 0; i < RESTAURANTS.length; i++) {
+    if (RESTAURANTS[i].name.toLowerCase() === wanted) {
+      state.restaurant = RESTAURANTS[i];
+      var card = $('res-restaurants').children[i];
+      card.classList.add('selected');
+      card.setAttribute('aria-pressed', 'true');
+      return true;
+    }
+  }
+  return false;
+}
+
   /* ---------- Init ---------- */
-  document.addEventListener('DOMContentLoaded', function () {
-    customer = resolveCustomer();
-    renderRestaurants();
-    bindCalendar();
-    bindDetails();
-    bindNav();
-    renderGuests();
-    goTo(1);
-  });
+  /* ---------- Init ---------- */
+document.addEventListener('DOMContentLoaded', function () {
+  customer = resolveCustomer();
+  renderRestaurants();
+  bindCalendar();
+  bindDetails();
+  bindNav();
+  renderGuests();
+  goTo(preselectRestaurant() ? 2 : 1);
+});
 })();
