@@ -90,19 +90,24 @@ $restaurant_name = $_GET['restaurant'] ?? 'The Revolving Restaurant';
         .cart-total-lbl { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--beige); }
         .cart-total-val { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; color: var(--navy); }
 
-        .fulfillment-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-        .fulfill-tab { flex: 1; padding: 10px 8px; border: 1.5px solid var(--beige); border-radius: 10px; background: #fff; cursor: pointer; text-align: center; transition: all var(--t); font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--charcoal); }
-        .fulfill-tab i { display: block; font-size: 1rem; margin-bottom: 4px; }
-        .fulfill-tab.active { border-color: var(--navy); background: var(--navy); color: var(--ivory); }
+        /* Single pickup badge (replaces the tab row) */
+        .pickup-mode-badge {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 12px; margin-bottom: 12px;
+            background: var(--navy); color: var(--ivory);
+            border-radius: 10px; font-size: .7rem; font-weight: 700;
+            letter-spacing: .06em; text-transform: uppercase;
+        }
+        .pickup-mode-badge i { color: var(--gold); font-size: .9rem; }
 
         .cart-field { margin-bottom: 10px; }
         .cart-field label { display: block; font-size: .66rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--navy); margin-bottom: 5px; }
-        .cart-field input, .cart-field select, .cart-field textarea {
+        .cart-field input {
             width: 100%; padding: 8px 12px; border: 1.5px solid var(--beige); border-radius: 8px;
             font-family: var(--sans); font-size: .82rem; color: var(--charcoal); outline: none; background: #fff;
             transition: border-color var(--t);
         }
-        .cart-field input:focus, .cart-field select:focus, .cart-field textarea:focus { border-color: var(--navy); }
+        .cart-field input:focus { border-color: var(--navy); }
 
         .cart-place-btn {
             width: 100%; justify-content: center; padding: 13px; margin-top: 6px;
@@ -176,43 +181,15 @@ $restaurant_name = $_GET['restaurant'] ?? 'The Revolving Restaurant';
                             <span class="cart-total-val" id="cart-total">0 EGP</span>
                         </div>
 
-                        <div class="fulfillment-tabs">
-                            <button type="button" class="fulfill-tab active" data-type="pickup" onclick="selectFulfillment('pickup', this)">
-                                <i class="fa-solid fa-bag-shopping"></i> Pickup
-                            </button>
-                            <button type="button" class="fulfill-tab" data-type="dinein" onclick="selectFulfillment('dinein', this)">
-                                <i class="fa-solid fa-utensils"></i> Dine-In
-                            </button>
+                        <!-- Pickup-only mode (dine-in will return with reservations later) -->
+                        <div class="pickup-mode-badge">
+                            <i class="fa-solid fa-bag-shopping"></i> Pickup Pre-Order
                         </div>
 
-                        <!-- Pickup fields -->
                         <div id="pickup-fields">
                             <div class="cart-field">
                                 <label for="pickup-time">Pickup Time</label>
                                 <input type="time" id="pickup-time" value="19:00">
-                            </div>
-                        </div>
-
-                        <!-- Dine-in fields -->
-                        <div id="dinein-fields" style="display:none;">
-                            <div class="cart-field">
-                                <label for="dinein-time">Arrival Time</label>
-                                <input type="time" id="dinein-time" value="19:00">
-                            </div>
-                            <div class="cart-field">
-                                <label for="dinein-party">Party Size</label>
-                                <select id="dinein-party">
-                                    <option value="1">1 guest</option>
-                                    <option value="2" selected>2 guests</option>
-                                    <option value="3">3 guests</option>
-                                    <option value="4">4 guests</option>
-                                    <option value="5">5 guests</option>
-                                    <option value="6">6+ guests</option>
-                                </select>
-                            </div>
-                            <div class="cart-field">
-                                <label for="dinein-notes">Special Requests</label>
-                                <textarea id="dinein-notes" rows="2" placeholder="Allergies, celebrations..."></textarea>
                             </div>
                         </div>
 
