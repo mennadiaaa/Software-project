@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
 
-// Admin accounts dataset
 $admin_accounts = [
     'admin' => [
         'id'       => 'admin',
@@ -14,7 +13,6 @@ $admin_accounts = [
     ]
 ];
 
-// Switch account via URL query, session, or cookie
 if (isset($_GET['admin']) && isset($admin_accounts[$_GET['admin']])) {
     $_SESSION['admin_account'] = $_GET['admin'];
 }
@@ -41,19 +39,16 @@ $admin_param = '?admin=' . urlencode($admin_id);
     <nav>
         <div class="nav-label">System Control</div>
 
-        <!-- Dashboard Link -->
         <a href="dashboard.php<?= $admin_param ?>" class="nav-link <?= $page === 'dashboard.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
             Dashboard
         </a>
 
-        <!-- User Management -->
         <a href="user_management.php<?= $admin_param ?>" class="nav-link <?= $page === 'user_management.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-users-gear"></i></span>
             User Management
         </a>
 
-        <!-- Restaurant Management -->
         <a href="restaurant_management.php<?= $admin_param ?>" class="nav-link <?= $page === 'restaurant_management.php' ? 'active' : '' ?>">
             <span class="icon"><i class="fa-solid fa-store"></i></span>
             Restaurant Management
@@ -66,17 +61,20 @@ $admin_param = '?admin=' . urlencode($admin_id);
     </nav>
 
     <div class="sidebar-foot">
-        <!-- Admin Info Card -->
-        <div class="staff-chip admin-chip">
+        <a href="profile.php<?= $admin_param ?>"
+           class="staff-chip admin-chip"
+           title="View my profile"
+           style="text-decoration:none;display:flex;align-items:center;gap:10px;border-radius:12px;cursor:pointer;transition:background .2s;"
+           onmouseover="this.style.background='rgba(201,169,110,.08)'"
+           onmouseout="this.style.background=''">
             <div class="avatar"><?= htmlspecialchars($current_admin['avatar']) ?></div>
             <div>
                 <span class="staff-name"><?= htmlspecialchars($current_admin['name']) ?></span>
                 <span class="staff-role"><?= htmlspecialchars($current_admin['role']) ?></span>
                 <span class="staff-branch"><i class="fa-solid fa-shield-halved"></i> <?= htmlspecialchars($current_admin['email']) ?></span>
             </div>
-        </div>
+        </a>
 
-        <!-- Logout Link -->
         <a href="../auth/login.php" class="logout-btn"
            onclick="if (confirm('Log out from Admin Portal?')) { localStorage.removeItem('savoure_current_user'); return true; } return false;">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
